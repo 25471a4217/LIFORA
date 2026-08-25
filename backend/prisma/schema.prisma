@@ -1,0 +1,498 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                 String          @id @default(uuid())
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
+  email              String          @unique
+  passwordHash       String
+  name               String
+  age                Int?
+  gender             String?
+  profession         String?
+  availableDailyMinutes Int      @default(120)
+  timezone           String?         @default("UTC")
+  avatar             String?
+  onboardingCompleted Boolean        @default(false)
+  role               Role            @default(USER)
+  refreshTokenHash   String?
+  profile            Profile?
+  focusAreas         UserFocusArea[]
+  goals              Goal[]
+  tasks              Task[]
+  userSkills         UserSkill[]
+  lessons            UserLessonProgress[]
+  quizAttempts       QuizAttempt[]
+  habits             Habit[]
+  xpTransactions     XPTransaction[]
+  userBadges         UserBadge[]
+  notifications      Notification[]
+  aiConversations    AIConversation[]
+  dailyPlans         DailyPlan[]
+  analyticsSnapshots AnalyticsSnapshot[]
+  communityMember    CommunityMember?
+}
+
+model Profile {
+  id          String   @id @default(uuid())
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      String   @unique
+  bio         String?
+  topAreas    String[] @default([])
+  goals       String[] @default([])
+}
+
+model FocusArea {
+  id          String          @id @default(uuid())
+  name        String          @unique
+  description String?
+  users       UserFocusArea[]
+}
+
+model UserFocusArea {
+  id          String   @id @default(uuid())
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      String
+  focusArea   FocusArea @relation(fields: [focusAreaId], references: [id], onDelete: Cascade)
+  focusAreaId String
+  @@unique([userId, focusAreaId])
+}
+
+model Goal {
+  id            String      @id @default(uuid())
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId        String
+  title         String
+  description   String?
+  category      String?
+  targetDate    DateTime?
+  priority      Priority    @default(MEDIUM)
+  status        GoalStatus  @default(ACTIVE)
+  progress      Int         @default(0)
+  requiredHours Int         @default(0)
+  difficulty    Difficulty  @default(MEDIUM)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  goalSkills    GoalSkill[]
+  tasks         Task[]
+  @@index([userId])
+}
+
+model Skill {
+  id            String            @id @default(uuid())
+  name          String            @unique
+  description   String?
+  level         Int               @default(0)
+  status        SkillStatus       @default(LOCKED)
+  progress      Int               @default(0)
+  dependencies  SkillDependency[] @relation("Prerequisites")
+  dependents    SkillDependency[] @relation("Dependents")
+  userSkills    UserSkill[]
+  goalSkills    GoalSkill[]
+}
+
+model SkillDependency {
+  id          String  @id @default(uuid())
+  skill       Skill   @relation("Prerequisites", fields: [skillId], references: [id], onDelete: Cascade)
+  skillId     String
+  dependsOn   Skill   @relation("Dependents", fields: [dependsOnId], references: [id], onDelete: Cascade)
+  dependsOnId String
+  @@unique([skillId, dependsOnId])
+}
+
+model UserSkill {
+  id        String       @id @default(uuid())
+  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  skill     Skill        @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  skillId   String
+  level     Int          @default(1)
+  progress  Int          @default(0)
+  status    SkillStatus  @default(LOCKED)
+  updatedAt DateTime     @updatedAt
+  @@unique([userId, skillId])
+}
+
+model GoalSkill {
+  id        String   @id @default(uuid())
+  goal      Goal     @relation(fields: [goalId], references: [id], onDelete: Cascade)
+  goalId    String
+  skill     Skill    @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  skillId   String
+  required  Int      @default(1)
+  @@unique([goalId, skillId])
+}
+
+model Task {
+  id                  String       @id @default(uuid())
+  user                User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId              String
+  goal                Goal?        @relation(fields: [goalId], references: [id], onDelete: SetNull)
+  goalId              String?
+  skill               Skill?       @relation(fields: [skillId], references: [id], onDelete: SetNull)
+  skillId             String?
+  title               String
+  description         String?
+  category            String?
+  priority            Priority     @default(MEDIUM)
+  estimatedMinutes    Int          @default(30)
+  scheduledStart      DateTime?
+  scheduledEnd        DateTime?
+  status              TaskStatus   @default(TODO)
+  difficulty          Difficulty   @default(MEDIUM)
+  source              String?      @default("planner")
+  verificationRequired Boolean     @default(false)
+  createdAt           DateTime     @default(now())
+  updatedAt           DateTime     @updatedAt
+  verifications       TaskVerification[]
+  @@index([userId])
+  @@index([goalId])
+  @@index([status])
+}
+
+model TaskVerification {
+  id          String        @id @default(uuid())
+  task        Task          @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  taskId      String
+  method      VerificationMethod
+  status      VerificationStatus @default(PENDING)
+  startedAt   DateTime      @default(now())
+  completedAt DateTime?
+  createdAt   DateTime      @default(now())
+}
+
+model Course {
+  id          String      @id @default(uuid())
+  title       String
+  description String?
+  category    String?
+  modules     Module[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+model Module {
+  id          String      @id @default(uuid())
+  course      Course      @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  courseId    String
+  title       String
+  description String?
+  order       Int         @default(0)
+  lessons     Lesson[]
+}
+
+model Lesson {
+  id          String      @id @default(uuid())
+  module      Module      @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  moduleId    String
+  title       String
+  description String?
+  contentUrl  String?
+  order       Int         @default(0)
+  userProgress UserLessonProgress[]
+}
+
+model UserLessonProgress {
+  id        String   @id @default(uuid())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  lesson    Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  lessonId  String
+  progress  Int      @default(0)
+  completed Boolean  @default(false)
+  updatedAt DateTime @updatedAt
+  @@unique([userId, lessonId])
+}
+
+model Quiz {
+  id          String     @id @default(uuid())
+  title       String
+  description String?
+  questions   Question[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}
+
+model Question {
+  id          String   @id @default(uuid())
+  quiz        Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  quizId      String
+  text        String
+  options     String[]
+  correctIndex Int
+  order       Int      @default(0)
+}
+
+model QuizAttempt {
+  id          String     @id @default(uuid())
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      String
+  quiz        Quiz       @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  quizId      String
+  score       Int        @default(0)
+  completed   Boolean    @default(false)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  answers     QuizAnswer[]
+}
+
+model QuizAnswer {
+  id          String    @id @default(uuid())
+  attempt     QuizAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  attemptId   String
+  question    Question  @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  questionId  String
+  selectedIndex Int
+  correct     Boolean
+}
+
+model Habit {
+  id          String      @id @default(uuid())
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      String
+  title       String
+  frequency   String
+  streak      Int         @default(0)
+  completedCount Int      @default(0)
+  missedCount Int         @default(0)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  logs        HabitLog[]
+}
+
+model HabitLog {
+  id          String   @id @default(uuid())
+  habit       Habit    @relation(fields: [habitId], references: [id], onDelete: Cascade)
+  habitId     String
+  date        DateTime
+  completed   Boolean  @default(true)
+}
+
+model XPTransaction {
+  id          String      @id @default(uuid())
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      String
+  amount      Int
+  source      String
+  createdAt   DateTime    @default(now())
+}
+
+model Badge {
+  id          String      @id @default(uuid())
+  title       String
+  description String?
+  icon        String?
+  createdAt   DateTime    @default(now())
+  userBadges  UserBadge[]
+}
+
+model UserBadge {
+  id          String   @id @default(uuid())
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      String
+  badge       Badge    @relation(fields: [badgeId], references: [id], onDelete: Cascade)
+  badgeId     String
+  earnedAt    DateTime @default(now())
+  @@unique([userId, badgeId])
+}
+
+model Notification {
+  id          String           @id @default(uuid())
+  user        User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      String
+  type        NotificationType
+  title       String
+  message     String
+  seen        Boolean          @default(false)
+  createdAt   DateTime         @default(now())
+}
+
+model AIConversation {
+  id          String      @id @default(uuid())
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      String
+  title       String?
+  messages    AIMessage[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+model AIMessage {
+  id              String         @id @default(uuid())
+  conversation    AIConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  conversationId  String
+  role            String
+  content         String
+  createdAt       DateTime       @default(now())
+}
+
+model AIRecommendation {
+  id          String      @id @default(uuid())
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      String
+  payload     Json
+  createdAt   DateTime    @default(now())
+}
+
+model DailyPlan {
+  id          String      @id @default(uuid())
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      String
+  date        DateTime
+  payload     Json
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  @@unique([userId, date])
+}
+
+model AnalyticsSnapshot {
+  id          String      @id @default(uuid())
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      String
+  date        DateTime
+  snapshot    Json
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  @@unique([userId, date])
+}
+
+model Career {
+  id          String       @id @default(uuid())
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      String
+  goal        String
+  currentPlan String?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  skills      CareerSkill[]
+}
+
+model CareerSkill {
+  id          String   @id @default(uuid())
+  career      Career   @relation(fields: [careerId], references: [id], onDelete: Cascade)
+  careerId    String
+  name        String
+  required    Int      @default(0)
+  current     Int      @default(0)
+}
+
+model CareerRoadmap {
+  id          String   @id @default(uuid())
+  career      Career   @relation(fields: [careerId], references: [id], onDelete: Cascade)
+  careerId    String
+  year        Int
+  focus       String
+}
+
+model CommunityGroup {
+  id          String           @id @default(uuid())
+  name        String
+  description String?
+  topic       String?
+  members     CommunityMember[]
+  posts       Post[]
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+}
+
+model CommunityMember {
+  id          String          @id @default(uuid())
+  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      String
+  group       CommunityGroup  @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  groupId     String
+  joinedAt    DateTime        @default(now())
+  role        MemberRole      @default(MEMBER)
+  @@unique([userId, groupId])
+}
+
+model Post {
+  id          String          @id @default(uuid())
+  group       CommunityGroup  @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  groupId     String
+  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      String
+  content     String
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  moderated   Boolean         @default(false)
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum GoalStatus {
+  ACTIVE
+  PAUSED
+  COMPLETED
+  ARCHIVED
+}
+
+enum Difficulty {
+  EASY
+  MEDIUM
+  HARD
+}
+
+enum SkillStatus {
+  LOCKED
+  UNLOCKED
+  IN_PROGRESS
+  MASTERED
+}
+
+enum TaskStatus {
+  TODO
+  IN_PROGRESS
+  COMPLETED
+  SKIPPED
+  MISSED
+  RESCHEDULED
+}
+
+enum VerificationMethod {
+  MANUAL
+  TIMER
+  VOICE
+  CAMERA
+  LOCATION
+  MOTION
+}
+
+enum VerificationStatus {
+  PENDING
+  COMPLETED
+  FAILED
+}
+
+enum NotificationType {
+  TASK_REMINDER
+  GOAL_DEADLINE
+  STREAK
+  QUIZ
+  AI_RECOMMENDATION
+  RECOVERY_PLAN
+  ACHIEVEMENT
+}
+
+enum MemberRole {
+  MEMBER
+  MODERATOR
+  ADMIN
+}
