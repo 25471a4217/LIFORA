@@ -10,7 +10,7 @@ export default function ProfilePage() {
         <div>
           <span className="eyebrow">Profile</span>
           <h2 style={{ margin: 0 }}>{name || 'Learner'}</h2>
-          <p style={{ color: 'rgba(255,255,255,0.7)', margin: '0.3rem 0 0' }}>{mainGoal}</p>
+          <p style={{ color: 'var(--muted)', margin: '0.3rem 0 0' }}>{mainGoal}</p>
         </div>
         <button className="ghost-btn">Edit Profile</button>
       </div>
@@ -23,7 +23,7 @@ export default function ProfilePage() {
           ['Growth Score', growthScore],
         ].map(([label, val]) => (
           <article key={label}>
-            <span style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.85rem' }}>{label}</span>
+            <span style={{ color: 'var(--muted)', fontSize: '0.85rem' }}>{label}</span>
             <strong style={{ display: 'block', fontSize: '1.6rem', marginTop: '0.3rem' }}>{val}</strong>
           </article>
         ))}

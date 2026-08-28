@@ -19,7 +19,7 @@ export default function AnalyticsPage() {
         <article className="analytics-card">
           <span className="eyebrow">Weekly learning</span>
           <strong style={{ fontSize: '2rem' }}>8h 20m</strong>
-          <p style={{ color: 'rgba(255,255,255,0.7)', margin: 0, fontSize: '0.9rem' }}>Steady upward momentum</p>
+          <p style={{ color: 'var(--muted)', margin: 0, fontSize: '0.9rem' }}>Steady upward momentum</p>
         </article>
         <article className="analytics-card">
           <span className="eyebrow">Habit consistency</span>

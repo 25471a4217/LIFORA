@@ -35,8 +35,8 @@ export default function QuizPage({ onBack }) {
           <p>Score: <strong>{resultModal.score} / {resultModal.total}</strong></p>
           <p>Accuracy: <strong>{resultModal.accuracy}%</strong></p>
           <p>XP earned: <strong>{resultModal.xp}</strong></p>
-          <p style={{ color: 'rgba(255,255,255,0.7)' }}>Weak areas: DSA, Advanced Algorithms</p>
-          <p style={{ color: 'rgba(255,255,255,0.7)' }}>Recommended: Machine Learning fundamentals</p>
+          <p style={{ color: 'var(--muted)' }}>Weak areas: DSA, Advanced Algorithms</p>
+          <p style={{ color: 'var(--muted)' }}>Recommended: Machine Learning fundamentals</p>
         </Modal>
       </div>
     );

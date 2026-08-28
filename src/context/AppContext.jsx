@@ -36,6 +36,14 @@ const INITIAL_STATE = {
     { id: 'flutter', title: 'Flutter Developer', progress: 24, current: 'Widgets', next: 'State Management', locked: false },
     { id: 'business', title: 'Business Strategy', progress: 14, current: 'Market Study', next: 'Product Roadmap', locked: true },
   ],
+  skillsData: [
+    { id: 'python', name: 'Python', level: 3, xp: 60, icon: '🐍', theme: 'linear-gradient(135deg, #306998, #ffd43b)' },
+    { id: 'java', name: 'Java', level: 2, xp: 40, icon: '☕', theme: 'linear-gradient(135deg, #f89820, #5382a1)' },
+    { id: 'html', name: 'HTML & CSS', level: 4, xp: 80, icon: '🎨', theme: 'linear-gradient(135deg, #e34c26, #264de4)' },
+    { id: 'communication', name: 'Communication', level: 3, xp: 55, icon: '🗣️', theme: 'linear-gradient(135deg, #00f2fe, #4facfe)' },
+    { id: 'ai', name: 'AI & ML', level: 1, xp: 20, icon: '🧠', theme: 'linear-gradient(135deg, #b46fff, #5d8bff)' },
+    { id: 'business', name: 'Entrepreneurship', level: 2, xp: 50, icon: '🚀', theme: 'linear-gradient(135deg, #f6d365, #fda085)' }
+  ],
   modules: [
     { title: 'Python Basics', status: 'complete' },
     { title: 'Functions', status: 'complete' },

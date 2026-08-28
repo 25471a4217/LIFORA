@@ -12,6 +12,7 @@ import CoursePage from './CoursePage';
 import QuizPage from './QuizPage';
 import CoachPage from './CoachPage';
 import FuturePage from './FuturePage';
+import SkillGalaxyPage from './SkillGalaxyPage';
 import AnalyticsPage from './AnalyticsPage';
 import HabitsPage from './HabitsPage';
 import RewardsPage from './RewardsPage';
@@ -21,6 +22,7 @@ import ProfilePage from './ProfilePage';
 const NAV_ITEMS = [
   { key: 'home', label: 'Dashboard' },
   { key: 'tasks', label: 'My Tasks' },
+  { key: 'galaxy', label: '🌌 Skill Galaxy' },
   { key: 'learning', label: 'Learning & Videos' },
   { key: 'quiz', label: 'Quiz & Practice' },
   { key: 'coach', label: 'AI Study Assistant' },
@@ -43,6 +45,8 @@ const MOBILE_NAV = [
 export default function MainApp({ onLogout }) {
   const { state, update, updateUser } = useApp();
   const [page, setPage] = useState('home');
+  const [history, setHistory] = useState(['home']);
+  const [activeCourseId, setActiveCourseId] = useState('python');
   const [showCommand, setShowCommand] = useState(false);
   const [notifModal, setNotifModal] = useState(false);
   const [settingsModal, setSettingsModal] = useState(false);
@@ -60,14 +64,30 @@ export default function MainApp({ onLogout }) {
     return () => document.removeEventListener('keydown', handler);
   }, []);
 
-  const navigate = useCallback((p) => setPage(p), []);
+  const navigate = useCallback((p) => {
+    setPage(p);
+    setHistory(prev => {
+      if (prev[prev.length - 1] === p) return prev;
+      return [...prev, p];
+    });
+  }, []);
+
+  const goBack = useCallback(() => {
+    setHistory(prev => {
+      if (prev.length <= 1) return prev;
+      const newHistory = prev.slice(0, -1);
+      setPage(newHistory[newHistory.length - 1]);
+      return newHistory;
+    });
+  }, []);
 
   function renderPage() {
     switch (page) {
       case 'home':     return <HomePage onNavigate={navigate} />;
       case 'tasks':    return <TasksPage />;
-      case 'learning': return <LearningPage onOpenCourse={() => navigate('course')} />;
-      case 'course':   return <CoursePage onBack={() => navigate('learning')} />;
+      case 'galaxy':   return <SkillGalaxyPage />;
+      case 'learning': return <LearningPage onOpenCourse={(id) => { setActiveCourseId(id); navigate('course'); }} />;
+      case 'course':   return <CoursePage courseId={activeCourseId} onBack={() => navigate('learning')} />;
       case 'quiz':     return <QuizPage onBack={() => navigate('learning')} />;
       case 'coach':    return <CoachPage />;
       case 'future':   return <FuturePage />;
@@ -121,6 +141,16 @@ export default function MainApp({ onLogout }) {
         {/* Topbar */}
         <header className="topbar">
           <div className="search-block">
+            {history.length > 1 && (
+              <button 
+                className="back-btn" 
+                onClick={goBack} 
+                title="Go back"
+                style={{ padding: '0.5rem 0.8rem', marginRight: '0.2rem' }}
+              >
+                ← Back
+              </button>
+            )}
             <button className="icon-btn" id="openCommand" aria-label="Open command center" onClick={() => setShowCommand(true)}>⌘</button>
             <input type="search" placeholder="Search tasks, courses, skills..." />
           </div>
@@ -184,14 +214,14 @@ export default function MainApp({ onLogout }) {
       {/* Settings modal */}
       {settingsModal && (
         <Modal title="Settings" onClose={() => setSettingsModal(false)} footer={<button className="primary-btn" onClick={() => setSettingsModal(false)}>Close</button>}>
-          <p style={{ color: 'rgba(255,255,255,0.8)' }}>Theme, account, notifications, and privacy controls are in development for your Life OS.</p>
+          <p style={{ color: 'var(--text)' }}>Theme, account, notifications, and privacy controls are in development for your Life OS.</p>
         </Modal>
       )}
 
       {/* Help modal */}
       {helpModal && (
         <Modal title="Help" onClose={() => setHelpModal(false)} footer={<button className="primary-btn" onClick={() => setHelpModal(false)}>Close</button>}>
-          <p style={{ color: 'rgba(255,255,255,0.8)' }}>Explore the dashboard, complete tasks, and use AI Coach to guide your next move. Press <strong>Ctrl+K</strong> to open the command center.</p>
+          <p style={{ color: 'var(--text)' }}>Explore the dashboard, complete tasks, and use AI Coach to guide your next move. Press <strong>Ctrl+K</strong> to open the command center.</p>
         </Modal>
       )}
     </div>

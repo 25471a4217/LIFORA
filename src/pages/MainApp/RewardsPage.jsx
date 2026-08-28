@@ -34,7 +34,7 @@ export default function RewardsPage() {
           <article key={b.name} className={b.locked ? 'locked' : ''}>
             <span style={{ fontSize: '2rem' }}>{b.emoji}</span>
             <strong style={{ display: 'block', marginTop: '0.5rem' }}>{b.name}</strong>
-            {b.locked && <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.8rem' }}>Locked</span>}
+            {b.locked && <span style={{ color: 'rgba(0, 0, 0, 0.4)', fontSize: '0.8rem' }}>Locked</span>}
           </article>
         ))}
       </div>

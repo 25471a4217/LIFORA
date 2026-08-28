@@ -13,13 +13,13 @@ function AddTaskModal({ onSave, onClose }) {
     <Modal title="Deploy New Mission 🚀" onClose={onClose} footer={
       <button className="primary-btn" onClick={save}>Launch Mission</button>
     }>
-      <label style={{ display: 'block', marginTop: '0.75rem', color: 'rgba(255,255,255,0.86)' }}>Mission Title</label>
+      <label style={{ display: 'block', marginTop: '0.75rem', color: 'var(--text)' }}>Mission Title</label>
       <input className="onboard-input" type="text" placeholder="Build React RAG Component" value={form.title} onChange={set('title')} />
       
-      <label style={{ display: 'block', marginTop: '0.75rem', color: 'rgba(255,255,255,0.86)' }}>Goal Category</label>
+      <label style={{ display: 'block', marginTop: '0.75rem', color: 'var(--text)' }}>Goal Category</label>
       <input className="onboard-input" type="text" placeholder="AI Architect Roadmap" value={form.goal} onChange={set('goal')} />
       
-      <label style={{ display: 'block', marginTop: '0.75rem', color: 'rgba(255,255,255,0.86)' }}>Difficulty Level</label>
+      <label style={{ display: 'block', marginTop: '0.75rem', color: 'var(--text)' }}>Difficulty Level</label>
       <select className="onboard-input" value={form.priority} onChange={set('priority')} style={{ background: '#0e1937', color: '#eef3ff' }}>
         <option value="Level 1 🎮">Level 1 🎮 (Quick Warm-up)</option>
         <option value="Boss Level 👾">Boss Level 👾 (High Impact / Complex)</option>
@@ -28,11 +28,11 @@ function AddTaskModal({ onSave, onClose }) {
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem', marginTop: '0.75rem' }}>
         <div>
-          <label style={{ display: 'block', color: 'rgba(255,255,255,0.86)' }}>Time</label>
+          <label style={{ display: 'block', color: 'var(--text)' }}>Time</label>
           <input className="onboard-input" type="text" placeholder="14:00" value={form.time} onChange={set('time')} />
         </div>
         <div>
-          <label style={{ display: 'block', color: 'rgba(255,255,255,0.86)' }}>Duration</label>
+          <label style={{ display: 'block', color: 'var(--text)' }}>Duration</label>
           <input className="onboard-input" type="text" placeholder="10 min Sprint" value={form.duration} onChange={set('duration')} />
         </div>
       </div>
@@ -69,7 +69,7 @@ function MissionSprintModal({ task, onComplete, onClose }) {
       }
     >
       <div style={{ textAlign: 'center', padding: '1rem 0' }}>
-        <p style={{ color: 'rgba(255,255,255,0.7)', margin: '0 0 1rem' }}>
+        <p style={{ color: 'var(--muted)', margin: '0 0 1rem' }}>
           The goal is not to solve everything at once. Just commit <strong>10 minutes</strong> to build natural momentum!
         </p>
 
@@ -93,18 +93,18 @@ function CompleteModal({ task, onManual, onSprint, onClose }) {
         <button className="primary-btn" onClick={onSprint}>Start 10-Min Sprint</button>
       </>
     }>
-      <p style={{ lineHeight: '1.5', color: 'rgba(255,255,255,0.9)' }}>
+      <p style={{ lineHeight: '1.5', color: 'var(--text)' }}>
         Ready to check off <strong>{task.title}</strong>? Connect a small present action to your near-future career momentum!
       </p>
       <div className="feature-card" style={{ marginBottom: '0.5rem', border: '1px solid rgba(118,245,255,0.3)' }}>
         <strong>⚡ 10-Minute Mission Sprint</strong>
-        <p style={{ margin: '0.3rem 0 0', color: 'rgba(255,255,255,0.7)' }}>
+        <p style={{ margin: '0.3rem 0 0', color: 'var(--muted)' }}>
           Work for just 10 minutes. If you start now, you'll reach a much lighter position by the end of the hour.
         </p>
       </div>
       <div className="feature-card" style={{ marginBottom: '0.5rem' }}>
         <strong> instant Checkpoint Victory</strong>
-        <p style={{ margin: '0.3rem 0 0', color: 'rgba(255,255,255,0.7)' }}>Claim +{task.xp || 35} XP immediately.</p>
+        <p style={{ margin: '0.3rem 0 0', color: 'var(--muted)' }}>Claim +{task.xp || 35} XP immediately.</p>
       </div>
     </Modal>
   );
@@ -116,7 +116,7 @@ function XPModal({ task, xp, onClose }) {
       <div style={{ textAlign: 'center', padding: '1rem 0' }}>
         <div style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>🎉</div>
         <h3>+{xp} XP Earned!</h3>
-        <p style={{ color: 'rgba(255,255,255,0.8)' }}>
+        <p style={{ color: 'var(--text)' }}>
           By finishing <strong>{task.title}</strong>, your future workload just got significantly lighter.
         </p>
       </div>
@@ -199,7 +199,7 @@ export default function TasksPage({ addTaskTrigger }) {
         <div>
           <span className="eyebrow">TASK GAMIFICATION SYSTEM</span>
           <h2 style={{ margin: 0 }}>Mission Control & Sprints</h2>
-          <p style={{ color: 'rgba(255,255,255,0.7)', margin: '0.3rem 0 0' }}>
+          <p style={{ color: 'var(--muted)', margin: '0.3rem 0 0' }}>
             Turn daily goals into levels, checkpoints, and boss challenges. Small present actions create big future progress.
           </p>
         </div>
@@ -212,11 +212,11 @@ export default function TasksPage({ addTaskTrigger }) {
           <div>
             <span className="eyebrow" style={{ color: '#76f5ff' }}>MISSION PROGRESS</span>
             <h3 style={{ margin: '0.2rem 0' }}>{completedCount} of {totalCount} Missions Accomplished ({completionPercentage}%)</h3>
-            <p style={{ margin: 0, fontSize: '0.85rem', color: 'rgba(255,255,255,0.7)' }}>
+            <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--muted)' }}>
               "If you finish just 1 micro-step now, your afternoon workload becomes 50% easier."
             </p>
           </div>
-          <div style={{ width: '180px', height: '10px', background: 'rgba(255,255,255,0.1)', borderRadius: '10px', overflow: 'hidden' }}>
+          <div style={{ width: '180px', height: '10px', background: 'var(--border)', borderRadius: '10px', overflow: 'hidden' }}>
             <div style={{ width: `${completionPercentage}%`, height: '100%', background: 'linear-gradient(90deg, #5d8bff, #76f5ff)', transition: 'width 0.5s ease' }} />
           </div>
         </div>
@@ -252,7 +252,7 @@ export default function TasksPage({ addTaskTrigger }) {
                       {badge}
                     </div>
                     <strong style={{ fontSize: '1.05rem', display: 'block' }}>{task.title}</strong>
-                    <p style={{ margin: '0.2rem 0 0', color: 'rgba(255,255,255,0.7)', fontSize: '0.88rem' }}>{task.goal}</p>
+                    <p style={{ margin: '0.2rem 0 0', color: 'var(--muted)', fontSize: '0.88rem' }}>{task.goal}</p>
                   </div>
                   <button className={isComplete ? 'secondary-btn' : 'primary-btn'} onClick={() => !isComplete && handleComplete(task)}>
                     {isComplete ? '✓ Victory' : 'Play Mission'}

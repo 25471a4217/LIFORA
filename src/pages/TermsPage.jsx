@@ -1,4 +1,4 @@
-export default function TermsPage({ onAccept, onDecline }) {
+export default function TermsPage({ onAccept, onDecline, onBack }) {
   const features = [
     { title: 'Required data only', desc: 'We collect only essential profile and preference data for your experience.' },
     { title: 'Optional camera permissions', desc: 'Future verification capabilities are optional and always disclosed.' },
@@ -17,7 +17,7 @@ export default function TermsPage({ onAccept, onDecline }) {
           <div>
             <span className="eyebrow">Your privacy comes first.</span>
             <h2 style={{ margin: '0.5rem 0' }}>Trustworthy by design</h2>
-            <p style={{ color: 'rgba(255,255,255,0.7)', margin: 0 }}>
+            <p style={{ color: 'var(--muted)', margin: 0 }}>
               LIFORA only uses the data needed to create your personal Life OS. You stay in control.
             </p>
           </div>
@@ -27,7 +27,7 @@ export default function TermsPage({ onAccept, onDecline }) {
               <article key={f.title} className="feature-card">
                 <span style={{ color: '#5d8bff', fontSize: '1.1rem' }}>✓</span>
                 <h3>{f.title}</h3>
-                <p style={{ color: 'rgba(255,255,255,0.7)', margin: 0, fontSize: '0.9rem' }}>{f.desc}</p>
+                <p style={{ color: 'var(--muted)', margin: 0, fontSize: '0.9rem' }}>{f.desc}</p>
               </article>
             ))}
           </div>
@@ -35,12 +35,13 @@ export default function TermsPage({ onAccept, onDecline }) {
           <div className="future-grid">
             <div>
               <h3 style={{ margin: '0 0 0.3rem' }}>Future verification methods</h3>
-              <p style={{ color: 'rgba(255,255,255,0.7)', margin: 0 }}>Camera, GPS, Motion, Voice, Wearables</p>
+              <p style={{ color: 'var(--muted)', margin: 0 }}>Camera, GPS, Motion, Voice, Wearables</p>
             </div>
             <div className="coming-soon">Coming Soon</div>
           </div>
 
           <div className="terms-actions">
+            <button className="secondary-btn" style={{ marginRight: 'auto' }} onClick={onBack}>← Back</button>
             <button className="secondary-btn" onClick={onDecline}>Decline</button>
             <button className="primary-btn" onClick={onAccept}>Accept &amp; Continue</button>
           </div>

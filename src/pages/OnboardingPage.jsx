@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useApp } from '../context/AppContext';
 
 const SKILL_ITEMS = [
@@ -153,7 +153,7 @@ const CONNECTIONS = {
     icon: '✨',
   },
   'Frontend & React': {
-    connectedGoals: ['Become a Full Stack Engineer', 'Lead UI/UX & Product Design'],
+    connectedGoals: ['Become a Full Stack Engineer', 'AR/VR Spatial Computing Developer'],
     synergy: 'Creates sleek, responsive, and high-performance interactive user interfaces.',
     icon: '⚛️',
   },
@@ -173,7 +173,7 @@ const CONNECTIONS = {
     icon: '🤖',
   },
   'Ethical Hacking': {
-    connectedGoals: ['Ethical Hacker & Security Lead', 'Become a Cyber Security Specialist'],
+    connectedGoals: ['Ethical Hacker & Security Lead', 'Quantum Computing Specialist'],
     synergy: 'Secures networks, performs penetration testing, and fortifies cyber defense mechanisms.',
     icon: '🔓',
   },
@@ -222,6 +222,125 @@ const CONNECTIONS = {
     synergy: 'Sustains physical energy, mental clarity, and consistent executive focus.',
     icon: '🏋️',
   },
+  'Finance & Investing': {
+    connectedGoals: ['Financial Independence & Wealth'],
+    synergy: 'Enables strategic budget control, smart compound savings, and asset allocation.',
+    icon: '💰',
+  },
+  'Entrepreneurship': {
+    connectedGoals: ['Build & Launch a Tech Startup'],
+    synergy: 'Empowers product validation, pitch architectures, venture backing, and corporate growth.',
+    icon: '🚀',
+  },
+  'Personal Growth': {
+    connectedGoals: ['Peak Fitness & Mindset Mastery'],
+    synergy: 'Cultivates high focus habits, daily meditation, journaling, and proactive self-learning.',
+    icon: '🌱',
+  },
+  'Communication': {
+    connectedGoals: ['Build & Launch a Tech Startup', 'Lead Technical Product Manager'],
+    synergy: 'Polishes executive presentation, strategic pitching, active team collaboration, and alignment.',
+    icon: '🗣️',
+  },
+  'Database & SQL/NoSQL': {
+    connectedGoals: ['Become a Full Stack Engineer', 'Senior Distributed System Architect', 'Lead Data & ML Engineer'],
+    synergy: 'Enables high-performance index setups, schema layouts, and persistent data access layers.',
+    icon: '🗄️',
+  },
+  'API Design & GraphQL': {
+    connectedGoals: ['Become a Full Stack Engineer', 'LLM Agentic Systems Specialist'],
+    synergy: 'Facilitates clean REST endpoints, GraphQL microservices, and client-server communication.',
+    icon: '🔌',
+  },
+  'Data Engineering & ETL': {
+    connectedGoals: ['Lead Data & ML Engineer'],
+    synergy: 'Orchestrates large-scale pipelines, ETL structures, and vector database architectures.',
+    icon: '🔀',
+  },
+  'Embedded Systems & IoT': {
+    connectedGoals: ['Robotics & Automation Engineer'],
+    synergy: 'Blends physical microcontroller circuits, custom firmware, and local communication modules.',
+    icon: '🔌',
+  },
+  'Game Development': {
+    connectedGoals: ['AR/VR Spatial Computing Developer', 'Become a Full Stack Engineer'],
+    synergy: 'Enables real-time 3D colliders, physics simulation, spatial mathematics, and gameplay logic.',
+    icon: '🎮',
+  },
+  'Deep Learning & Vision': {
+    connectedGoals: ['Become an AI Engineer', 'Lead Data & ML Engineer'],
+    synergy: 'Builds convolutional networks, object detection systems, and spatial segmentation models.',
+    icon: '👁️',
+  },
+  'NLP & Language Models': {
+    connectedGoals: ['Become an AI Engineer', 'LLM Agentic Systems Specialist'],
+    synergy: 'Orchestrates tokenizers, transformers, sentiment models, and text embedding modules.',
+    icon: '💬',
+  },
+  'Product Management': {
+    connectedGoals: ['Lead Technical Product Manager'],
+    synergy: 'Defines product requirement docs, coordinates sprints, and aligns release schedules.',
+    icon: '📋',
+  },
+  'Digital Marketing & Growth': {
+    connectedGoals: ['Build & Launch a Tech Startup', 'Lead Technical Product Manager'],
+    synergy: 'Accelerates search optimization, customer funnels, retention loops, and analytics dashboard growth.',
+    icon: '📈',
+  },
+  'Public Speaking': {
+    connectedGoals: ['Lead Technical Product Manager', 'Build & Launch a Tech Startup'],
+    synergy: 'Improves keynotes, body language command, vocal structure, and large audience engagement.',
+    icon: '🎙️',
+  },
+  'Time Management': {
+    connectedGoals: ['Peak Fitness & Mindset Mastery'],
+    synergy: 'Optimizes daily scheduling, time boxing, habit triggers, and goal tracking intervals.',
+    icon: '⏳',
+  },
+  'Executive Leadership': {
+    connectedGoals: ['Build & Launch a Tech Startup', 'Lead Technical Product Manager'],
+    synergy: 'Supports team delegation, milestone planning, performance metrics, and organizational values.',
+    icon: '👑',
+  }
+};
+
+const COURSE_MAPPING = {
+  'Full Stack Development': { id: 'fullstack', title: 'Full Stack Web Engineering', icon: '💻', current: 'HTML, CSS & React Foundations', next: 'Node.js & Express REST APIs' },
+  'Prompt Engineering': { id: 'prompt', title: 'LLM & Prompt Architecture', icon: '🤖', current: 'Zero-Shot & Few-Shot Prompts', next: 'Autonomous Agent Orchestration' },
+  'Quantum Computing': { id: 'quantum', title: 'Quantum Algorithms & Qubits', icon: '⚛️', current: 'Superposition & Qubit States', next: 'Quantum Entanglement Simulation' },
+  'AI & Machine Learning': { id: 'ai_ml', title: 'AI Foundations & ML Engineering', icon: '🧠', current: 'Supervised vs Unsupervised ML', next: 'Neural Network Architectures' },
+  'Data Science': { id: 'datascience', title: 'Data Science & Analytics', icon: '📊', current: 'Data Cleansing & Pandas Dataframes', next: 'Statistical Models & Regression' },
+  'Cyber Security': { id: 'security', title: 'Cyber Security Operations', icon: '🛡️', current: 'Network Encryption Basics', next: 'Penetration Testing Frameworks' },
+  'Cloud & DevOps': { id: 'cloud', title: 'Cloud DevOps & Systems', icon: '☁️', current: 'CI/CD Pipeline Automation', next: 'Serverless Kubernetes Clusters' },
+  'Mobile App Development': { id: 'mobile', title: 'Mobile App Development', icon: '📱', current: 'Dart & Flutter Widgets', next: 'State Management with Provider' },
+  'UI/UX Design': { id: 'uiux', title: 'UI/UX Design & Product Strategy', icon: '🎨', current: 'Wireframing & Typography Principles', next: 'Advanced Interactive Prototyping' },
+  'Blockchain': { id: 'blockchain', title: 'Blockchain & Web3 Developer', icon: '⛓️', current: 'Smart Contracts & Solidity', next: 'Decentralized Apps (dApps) Deployment' },
+  'Competitive Exams': { id: 'dsa_exams', title: 'Competitive Exams Prep & DSA', icon: '📝', current: 'Time Complexities & Sorting Algorithms', next: 'Graph Algorithms & Shortest Path' },
+  'Fitness & Health': { id: 'fitness', title: 'Fitness & Wellness Blueprint', icon: '🏋️', current: 'Nutrition & Daily Hydration Goals', next: 'High-Intensity Interval Training' },
+  'Finance & Investing': { id: 'finance', title: 'Finance & Wealth Management', icon: '💰', current: 'Compound Interest & Saving Rules', next: 'Stock Market Indices & Crypto Assets' },
+  'Entrepreneurship': { id: 'startup', title: 'Business Strategy & Startups', icon: '🚀', current: 'Building MVPs & Validating Ideas', next: 'Scaling Pitch Decks & Venture Capital' },
+  'Personal Growth': { id: 'growth', title: 'Leadership & Personal Mastery', icon: '🌱', current: 'Growth Mindset & Bullet Journaling', next: 'Emotional Intelligence & Stress Control' },
+  'Communication': { id: 'communication_course', title: 'Advanced Pitching & Communication', icon: '🗣️', current: 'Active Listening & Public Presentation', next: 'Negotiation Skills & Persuasion' },
+  'LLM & Agentic AI': { id: 'agentic', title: 'LLM & Agentic AI Orchestration', icon: '🤖', current: 'Multi-Agent Frameworks (CrewAI)', next: 'Agentic Tool-Use & Autopilot Coding' },
+  'Generative AI & RAG': { id: 'rag', title: 'Generative AI & RAG Architectures', icon: '✨', current: 'Vector Embeddings & Pinecone Setup', next: 'Hybrid Search & Retrieval Optimization' },
+  'Frontend & React': { id: 'frontend', title: 'Frontend React Development', icon: '⚛️', current: 'JSX Syntax & State Hooks', next: 'Custom Hooks & Context API Integration' },
+  'Backend & Microservices': { id: 'backend', title: 'Backend & Microservices', icon: '⚙️', current: 'REST API Design with Express.js', next: 'Message Queues (RabbitMQ) & Auth' },
+  'System Architecture': { id: 'sys_arch', title: 'System Architecture & Distribution', icon: '📐', current: 'Load Balancing & Database Sharding', next: 'Microservice Design Patterns' },
+  'Database & SQL/NoSQL': { id: 'database', title: 'Database Engineering', icon: '🗄️', current: 'SQL Queries & Index Optimization', next: 'NoSQL Schemas with MongoDB' },
+  'API Design & GraphQL': { id: 'api_design', title: 'API Design & GraphQL Masterclass', icon: '🔌', current: 'GraphQL Schemas & Resolvers', next: 'Apollo Client & Server Configuration' },
+  'Data Engineering & ETL': { id: 'data_eng', title: 'Data Engineering & ETL Pipelines', icon: '🔀', current: 'Apache Spark Dataframes', next: 'ETL Pipelines with Apache Airflow' },
+  'Embedded Systems & IoT': { id: 'iot', title: 'Embedded Systems & IoT Engineering', icon: '🔌', current: 'Microcontrollers & Sensor Inputs', next: 'Wireless Protocols (MQTT) Setup' },
+  'Robotics & Automation': { id: 'robotics', title: 'Robotics & Process Automation', icon: '🤖', current: 'ROS2 (Robot Operating System) Setup', next: 'Kinematics & Path Planning' },
+  'AR/VR & Spatial Computing': { id: 'arvr', title: 'AR/VR & Spatial Design', icon: '🥽', current: '3D Mesh Optimization in Unity', next: 'Spatial Audio & Haptic Feedback' },
+  'Game Development': { id: 'game', title: 'Game Development (Unity/Unreal)', icon: '🎮', current: 'C# Physics & Colliders in Unity', next: 'AI Pathfinding & Navigation Meshes' },
+  'Ethical Hacking': { id: 'hacking', title: 'Ethical Hacking & Penetration Testing', icon: '🔓', current: 'OWASP Top 10 Vulnerabilities', next: 'Wireshark Network Traffic Analysis' },
+  'Deep Learning & Vision': { id: 'deep_learning', title: 'Deep Learning & Computer Vision', icon: '👁️', current: 'Convolutional Neural Networks (CNNs)', next: 'Object Detection with YOLOv8' },
+  'NLP & Language Models': { id: 'nlp', title: 'Natural Language Processing', icon: '💬', current: 'Word Embeddings & Tokenization', next: 'Transformer Networks (Attention Mechanism)' },
+  'Product Management': { id: 'product', title: 'Technical Product Management', icon: '📋', current: 'PRD (Product Requirement Doc) Writing', next: 'Agile Sprints & Product Roadmap Metrics' },
+  'Digital Marketing & Growth': { id: 'marketing', title: 'Digital Growth Marketing', icon: '📈', current: 'SEO Strategy & Core Web Vitals', next: 'A/B Testing & Conversion Funnels' },
+  'Public Speaking': { id: 'public_speaking', title: 'Public Speaking & Keynotes', icon: '🎙️', current: 'Vocal Projection & Body Language', next: 'TED Talk Structure & Storytelling' },
+  'Time Management': { id: 'time_management', title: 'High Productivity & Habits', icon: '⏳', current: 'Eisenhower Matrix & Time Boxing', next: 'Atomic Habits & Habit Stacking Systems' },
+  'Executive Leadership': { id: 'leadership', title: 'Executive Leadership & Strategy', icon: '👑', current: 'OKRs (Objectives & Key Results) Setup', next: 'Conflict Resolution & Team Building' }
 };
 
 const TIME_SUGGESTIONS = [
@@ -240,7 +359,7 @@ const TIME_SUGGESTIONS = [
 
 const STEP_TITLES = { 1: 'ABOUT YOU', 2: 'WHAT MATTERS MOST TO YOU (36 SKILLS)', 3: 'WHAT FUTURE ARE YOU BUILDING (GOALS & JOBS)', 4: 'AVAILABLE TIME', 5: 'LIFE OS CREATION' };
 
-export default function OnboardingPage({ onComplete }) {
+export default function OnboardingPage({ onComplete, onBack }) {
   const { state, update, updateUser } = useApp();
   const [step, setStep] = useState(1);
   const [form1, setForm1] = useState({ name: state.user?.name || '', age: state.user?.age || '', profession: state.user?.profession || 'Student' });
@@ -249,8 +368,105 @@ export default function OnboardingPage({ onComplete }) {
   const [customGoal, setCustomGoal] = useState('');
   const [selectedTime, setSelectedTime] = useState('2 Hours');
   const [timeQuery, setTimeQuery] = useState('');
-  const [selectedSlots, setSelectedSlots] = useState(['Morning', 'Evening']);
+  const [selectedSlots, setSelectedSlots] = useState(['Morning', 'Afternoon', 'Evening', 'Night']);
   const [buildDone, setBuildDone] = useState(false);
+
+  // Gemini Predictive States
+  const [isPredicting, setIsPredicting] = useState(false);
+  const [predictionError, setPredictionError] = useState(null);
+  const [apiKey, setApiKey] = useState(() => localStorage.getItem('gemini_api_key') || '');
+  const [showApiKeyInput, setShowApiKeyInput] = useState(false);
+  const [predictedGoal, setPredictedGoal] = useState('');
+  const [predictedJobs, setPredictedJobs] = useState([]);
+
+  const runGeminiPrediction = useCallback(async () => {
+    setIsPredicting(true);
+    setPredictionError(null);
+
+    const skillsString = selectedAreas.join(', ');
+    const promptText = `Analyze these 5 priority tech/career skills selected by a student: [${skillsString}].
+Predict:
+1. One primary target career goal that fits these skills (e.g., 'Become a Full Stack Engineer', 'Become an AI Engineer', etc. Select or closely align with one of these goals: 'Become a Full Stack Engineer', 'Become a Prompt Engineer & AI Architect', 'Quantum Computing Specialist', 'Become an AI Engineer', 'LLM Agentic Systems Specialist', 'Generative AI & RAG Architect', 'Senior Distributed System Architect', 'Robotics & Automation Engineer', 'Ethical Hacker & Security Lead', 'Lead Data & ML Engineer', 'AR/VR Spatial Computing Developer', 'Lead Technical Product Manager', 'Build & Launch a Tech Startup', 'Crack UPSC / Competitive Exams', 'Financial Independence & Wealth', 'Peak Fitness & Mindset Mastery').
+2. Up to 4 job roles they qualify for, including job title, expected salary (e.g. '$130,000 - $160,000'), match percentage score (e.g. 92), demand level (e.g. 'EXTREME', 'VERY HIGH'), and matching skills they selected.
+
+Return ONLY a valid JSON object matching this structure exactly (do not include any markdown format blocks or text, just the raw JSON):
+{
+  "predictedGoal": "string matching one of the target goals",
+  "jobs": [
+    {
+      "title": "string",
+      "salary": "string",
+      "matchScore": number,
+      "demand": "string",
+      "skills": ["string"]
+    }
+  ]
+}`;
+
+    const key = apiKey || localStorage.getItem('gemini_api_key');
+    if (key) {
+      try {
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${key}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            contents: [{
+              parts: [{
+                text: promptText
+              }]
+            }],
+            generationConfig: {
+              responseMimeType: "application/json"
+            }
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error(`API Error: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        const responseText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+        
+        if (responseText) {
+          const parsed = JSON.parse(responseText.trim());
+          if (parsed.predictedGoal) {
+            setSelectedGoal(parsed.predictedGoal);
+            setPredictedGoal(parsed.predictedGoal);
+          }
+          if (parsed.jobs && Array.isArray(parsed.jobs)) {
+            setPredictedJobs(parsed.jobs);
+          }
+          setIsPredicting(false);
+          return;
+        }
+      } catch (err) {
+        console.error("Gemini API call failed, falling back to local model:", err);
+        setPredictionError("Could not connect to Gemini API. Falling back to local predictive emulation.");
+      }
+    }
+
+    // FALLBACK: Local Predictive Emulation
+    const firstSkill = selectedAreas[0];
+    const match = CONNECTIONS[firstSkill]?.connectedGoals[0] || 'Become a Prompt Engineer & AI Architect';
+    setSelectedGoal(match);
+    setPredictedGoal(match);
+
+    const matchedJobs = JOB_ROLES.filter(job =>
+      job.skills.some(skill => selectedAreas.includes(skill))
+    );
+    setPredictedJobs(matchedJobs.length > 0 ? matchedJobs : JOB_ROLES.slice(0, 4));
+
+    setIsPredicting(false);
+  }, [selectedAreas, apiKey, setSelectedGoal]);
+
+  useEffect(() => {
+    if (step === 3) {
+      runGeminiPrediction();
+    }
+  }, [step, runGeminiPrediction]);
 
   // Step 5: simulate build progress
   useEffect(() => {
@@ -282,16 +498,28 @@ export default function OnboardingPage({ onComplete }) {
     setStep(2);
   }
 
-  function handleStep2() {
+  const handleStep2 = useCallback(() => {
     if (selectedAreas.length === 0) return;
     update({ selectedAreas });
-    if (!selectedGoal) {
+    updateUser({ focusAreas: selectedAreas });
+
+    const connectedGoalIds = new Set();
+    selectedAreas.forEach(area => {
+      const conn = CONNECTIONS[area];
+      if (conn) {
+        conn.connectedGoals.forEach(g => connectedGoalIds.add(g));
+      }
+    });
+
+    if (!connectedGoalIds.has(selectedGoal)) {
       const firstSkill = selectedAreas[0];
       const match = CONNECTIONS[firstSkill]?.connectedGoals[0];
-      if (match) setSelectedGoal(match);
+      if (match) {
+        setSelectedGoal(match);
+      }
     }
     setStep(3);
-  }
+  }, [selectedAreas, selectedGoal, update, updateUser]);
 
   function handleStep3() {
     const goal = customGoal || selectedGoal || 'Become a Prompt Engineer & AI Architect';
@@ -301,15 +529,57 @@ export default function OnboardingPage({ onComplete }) {
   }
 
   function handleStep4() {
-    if (!selectedTime || selectedSlots.length === 0) return;
+    if (!selectedTime) return;
     update({ selectedTime, timeslots: selectedSlots });
     setStep(5);
   }
 
-  function handleFinalize() {
-    update({ onboardingComplete: true });
+  const handleFinalize = useCallback(() => {
+    const finalGoal = customGoal || selectedGoal || 'Become a Prompt Engineer & AI Architect';
+    
+    // Map selected skills to unlocked courses
+    const unlocked = selectedAreas.map((area, idx) => {
+      const match = COURSE_MAPPING[area];
+      if (match) {
+        return {
+          id: match.id,
+          title: match.title,
+          progress: idx === 0 ? 12 : 0, // 12% progress on first core course
+          current: match.current,
+          next: match.next,
+          locked: false
+        };
+      }
+      return null;
+    }).filter(Boolean);
+
+    // Fallbacks or default courses to keep list full (locked status)
+    const defaultLocked = [
+      { id: 'python', title: 'Python Mastery', progress: 68, current: 'Data Structures', next: 'Machine Learning', locked: false },
+      { id: 'ai', title: 'AI Foundations', progress: 42, current: 'Neural Networks', next: 'Model Deployment', locked: false },
+      { id: 'flutter', title: 'Flutter Developer', progress: 24, current: 'Widgets', next: 'State Management', locked: false },
+      { id: 'business', title: 'Business Strategy', progress: 14, current: 'Market Study', next: 'Product Roadmap', locked: true }
+    ];
+
+    const finalCourses = [...unlocked];
+    defaultLocked.forEach(def => {
+      if (!finalCourses.some(c => c.id === def.id)) {
+        finalCourses.push(def);
+      }
+    });
+
+    update({ 
+      onboardingComplete: true, 
+      selectedAreas, 
+      mainGoal: finalGoal,
+      courses: finalCourses
+    });
+    updateUser({ 
+      focusAreas: selectedAreas, 
+      mainGoal: finalGoal 
+    });
     onComplete();
-  }
+  }, [selectedAreas, selectedGoal, customGoal, update, updateUser, onComplete]);
 
   // Calculate connected goals for selected areas
   const connectedGoalIds = new Set();
@@ -332,14 +602,20 @@ export default function OnboardingPage({ onComplete }) {
         <header className="onboard-header">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span className="eyebrow">Step {step} / 5</span>
-            {step > 1 && (
-              <button type="button" className="back-btn" onClick={() => setStep(prev => prev - 1)}>
+            {(step > 1 || onBack) && (
+              <button type="button" className="back-btn" onClick={() => {
+                if (step > 1) {
+                  setStep(prev => prev - 1);
+                } else if (onBack) {
+                  onBack();
+                }
+              }}>
                 ← Back
               </button>
             )}
           </div>
           <h2 style={{ margin: 0 }}>{STEP_TITLES[step]}</h2>
-          <p style={{ color: 'rgba(255,255,255,0.7)', margin: 0 }}>
+          <p style={{ color: 'var(--muted)', margin: 0 }}>
             {step === 1 && 'Tell us the basics so LIFORA can personalize your Life OS.'}
             {step === 2 && 'Select up to 5 priority skills out of 36 high-demand domains.'}
             {step === 3 && 'Discover target goals and high-paying jobs unlocked by your selected skills.'}
@@ -364,7 +640,14 @@ export default function OnboardingPage({ onComplete }) {
               <option>Job Seeker</option>
               <option>Other</option>
             </select>
-            <button className="primary-btn full" onClick={handleStep1}>Continue to Skills →</button>
+            <div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.5rem' }}>
+              {onBack && (
+                <button type="button" className="back-btn" onClick={onBack}>
+                  ← Back
+                </button>
+              )}
+              <button className="primary-btn full" onClick={handleStep1}>Continue to Skills →</button>
+            </div>
           </div>
         )}
 
@@ -374,7 +657,7 @@ export default function OnboardingPage({ onComplete }) {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
               <div>
                 <h3 style={{ margin: 0 }}>What matters most to you?</h3>
-                <p style={{ color: 'rgba(255,255,255,0.7)', margin: '0.2rem 0 0', fontSize: '0.88rem' }}>
+                <p style={{ color: 'var(--muted)', margin: '0.2rem 0 0', fontSize: '0.88rem' }}>
                   Select up to 5 priority skills (36 available tech & life domains).
                 </p>
               </div>
@@ -385,7 +668,7 @@ export default function OnboardingPage({ onComplete }) {
 
             {/* Quick Presets */}
             <div className="quick-preset-row">
-              <span style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.6)' }}>Popular Skill Stacks:</span>
+              <span style={{ fontSize: '0.8rem', color: 'var(--muted)' }}>Popular Skill Stacks:</span>
               <button type="button" className="preset-btn" onClick={() => applyPreset(['Full Stack Development', 'Prompt Engineering', 'Quantum Computing', 'LLM & Agentic AI', 'Generative AI & RAG'])}>
                 ⚡ Next-Gen AI & Tech Stack
               </button>
@@ -410,7 +693,7 @@ export default function OnboardingPage({ onComplete }) {
                     <div className="tag-card-content">
                       <span className="tag-icon">{item.icon}</span>
                       <span className="tag-label">{item.label}</span>
-                      <span style={{ fontSize: '0.72rem', color: isActive ? '#76f5ff' : 'rgba(255,255,255,0.5)' }}>
+                      <span style={{ fontSize: '0.72rem', color: isActive ? '#76f5ff' : 'rgba(0, 0, 0, 0.5)' }}>
                         {item.tag}
                       </span>
                     </div>
@@ -433,143 +716,245 @@ export default function OnboardingPage({ onComplete }) {
         {/* Step 3 */}
         {step === 3 && (
           <div className="onboard-card">
-            <h3 style={{ margin: 0 }}>What future are you building?</h3>
-
-            {/* Skill Connection Banner */}
-            <div className="connection-banner">
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '0.8rem' }}>
+              <h3 style={{ margin: 0 }}>What future are you building?</h3>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <span style={{ fontSize: '1.2rem' }}>⚡</span>
-                <strong style={{ color: '#eef3ff', fontSize: '0.95rem' }}>
-                  Connected to your top selections from &ldquo;What matters most to you&rdquo;:
-                </strong>
-              </div>
-              <div className="connection-skills-row">
-                {selectedAreas.map(area => {
-                  const conn = CONNECTIONS[area];
-                  return (
-                    <span key={area} className="connected-skill-chip">
-                      <span>{conn?.icon || '⭐'}</span> {area}
-                    </span>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Goal Selection Grid */}
-            <h4 style={{ margin: '0.5rem 0 0', color: '#c3d1ff' }}>Target Future Goals:</h4>
-            <div className="goal-grid">
-              {GOAL_ITEMS.map(goal => {
-                const isSelected = (customGoal ? customGoal === goal.id : selectedGoal === goal.id);
-                const isConnected = connectedGoalIds.has(goal.id);
-                return (
-                  <button
-                    key={goal.id}
-                    type="button"
-                    className={`tag-card${isSelected ? ' active' : ''}${isConnected ? ' goal-card-connected' : ''}`}
-                    onClick={() => { setSelectedGoal(goal.id); setCustomGoal(''); }}
-                  >
-                    <div className="tag-card-content">
-                      {isConnected && (
-                        <span className="connected-badge">
-                          ⚡ Skill Connected
-                        </span>
-                      )}
-                      <span className="tag-icon">{goal.icon}</span>
-                      <span className="tag-label">{goal.label}</span>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Skills-to-Jobs Connection Feature */}
-            <div className="jobs-section">
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  <span style={{ fontSize: '1.25rem' }}>💼</span>
-                  <strong style={{ fontSize: '1rem', color: '#76f5ff' }}>
-                    Job Roles & Careers Unlocked by Your Selected Skills:
-                  </strong>
-                </div>
-                <span style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.6)' }}>
-                  Market Demand & Compensation
+                <span className="online" style={{ background: apiKey ? '#22c55e' : '#f59e0b' }} />
+                <span style={{ fontSize: '0.8rem', color: 'var(--muted)' }}>
+                  {apiKey ? 'Gemini 2.5 Active' : 'Local Emulation'}
                 </span>
-              </div>
-
-              <div className="jobs-grid">
-                {displayJobs.map(job => (
-                  <div key={job.title} className="job-card">
-                    <div>
-                      <div className="job-card-head">
-                        <h5 className="job-title">{job.title}</h5>
-                        <span className="job-match">{job.matchScore}% Match</span>
-                      </div>
-                      <span style={{ fontSize: '0.78rem', color: '#8da9ff', display: 'block', marginTop: '0.2rem' }}>
-                        {job.demand}
-                      </span>
-                    </div>
-
-                    <div className="job-salary">
-                      💰 {job.salary}
-                    </div>
-
-                    <div>
-                      <span style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.6)', display: 'block', marginBottom: '0.3rem' }}>
-                        Matching Skills:
-                      </span>
-                      <div className="job-skills-list">
-                        {job.skills.map(s => (
-                          <span key={s} className="job-skill-badge" style={{ borderColor: selectedAreas.includes(s) ? '#76f5ff' : 'transparent', color: selectedAreas.includes(s) ? '#76f5ff' : '#b5c7ff' }}>
-                            {s}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                ))}
+                <button 
+                  type="button" 
+                  className="text-button" 
+                  style={{ fontSize: '0.8rem', color: 'var(--blue)', marginLeft: '0.5rem', border: 'none', background: 'none', cursor: 'pointer' }} 
+                  onClick={() => setShowApiKeyInput(s => !s)}
+                >
+                  {apiKey ? '🔑 Change Key' : '🔑 Connect Key'}
+                </button>
               </div>
             </div>
 
-            {/* Skill-to-Goal Synergy Connection Explanation Box */}
-            {selectedGoal && (
-              <div className="synergy-box">
-                <div className="synergy-title">
-                  <span>🔗 SKILLS TO GOAL CONNECTION SYNERGY</span>
-                </div>
-                <p style={{ margin: 0, color: 'rgba(255,255,255,0.85)', fontSize: '0.92rem', lineHeight: '1.5' }}>
-                  Your top skills (<b>{selectedAreas.slice(0, 3).join(', ')}</b>) form a direct roadmap to achieve <b>&ldquo;{selectedGoal}&rdquo;</b>.
-                </p>
-                <div style={{ display: 'grid', gap: '0.4rem' }}>
-                  {selectedAreas.slice(0, 3).map(area => {
-                    const conn = CONNECTIONS[area];
-                    return (
-                      <div key={area} style={{ fontSize: '0.85rem', color: '#c3d1ff', display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-                        <span>{conn?.icon || '⚡'}</span>
-                        <span><b>{area}:</b> {conn?.synergy || 'Directly accelerates your goal roadmap.'}</span>
-                      </div>
-                    );
-                  })}
-                </div>
+            {showApiKeyInput && (
+              <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem', padding: '1rem', background: 'rgba(0,0,0,0.02)', borderRadius: '16px', border: '1px solid var(--border)' }}>
+                <input 
+                  type="password" 
+                  placeholder="Paste Gemini API Key from Google AI Studio..." 
+                  className="onboard-input" 
+                  style={{ flex: 1, margin: 0, padding: '0.5rem 0.8rem', fontSize: '0.85rem', height: '36px' }}
+                  value={apiKey}
+                  onChange={(e) => {
+                    setApiKey(e.target.value);
+                    localStorage.setItem('gemini_api_key', e.target.value);
+                  }}
+                />
+                <button 
+                  type="button" 
+                  className="primary-btn" 
+                  style={{ padding: '0 1rem', fontSize: '0.85rem', height: '36px' }}
+                  onClick={() => {
+                    setShowApiKeyInput(false);
+                    runGeminiPrediction();
+                  }}
+                >
+                  Predict
+                </button>
               </div>
             )}
 
-            <label style={{ marginTop: '0.5rem' }}>Or write your custom future goal</label>
-            <input
-              className="onboard-input"
-              type="text"
-              placeholder="e.g. Master Full Stack + Prompt Engineering & Quantum AI"
-              value={customGoal}
-              onChange={e => setCustomGoal(e.target.value)}
-            />
-            
-            <div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.5rem' }}>
-              <button type="button" className="back-btn" onClick={() => setStep(2)}>
-                ← Back
-              </button>
-              <button className="primary-btn full" onClick={handleStep3}>
-                Continue to Daily Schedule →
-              </button>
-            </div>
+            {isPredicting ? (
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '4rem 2rem', background: 'rgba(59, 130, 246, 0.03)', borderRadius: '24px', border: '1px dashed rgba(59, 130, 246, 0.3)', margin: '1rem 0' }}>
+                <div style={{ width: '40px', height: '40px', border: '3px solid rgba(0,0,0,0.06)', borderTopColor: 'var(--blue)', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
+                <strong style={{ marginTop: '1.2rem', color: 'var(--blue)', fontSize: '1rem' }}>🤖 Gemini Predicting Goals & Jobs...</strong>
+                <p style={{ margin: '0.5rem 0 0', color: 'var(--muted)', fontSize: '0.85rem', textAlign: 'center' }}>
+                  Synthesizing your {selectedAreas.length} selected focus areas and scanning target industry compensation...
+                </p>
+              </div>
+            ) : (
+              <>
+                {/* Skill Connection Banner */}
+                <div className="connection-banner" style={{ marginBottom: '1.25rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <span style={{ fontSize: '1.2rem' }}>⚡</span>
+                    <strong style={{ color: 'var(--text)', fontSize: '0.95rem' }}>
+                      Connected to your top selections from &ldquo;What matters most to you&rdquo;:
+                    </strong>
+                  </div>
+                  <div className="connection-skills-row">
+                    {selectedAreas.map(area => {
+                      const conn = CONNECTIONS[area];
+                      return (
+                        <span key={area} className="connected-skill-chip">
+                          <span>{conn?.icon || '⭐'}</span> {area}
+                        </span>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Goal Selection Grid */}
+                <h4 style={{ margin: '0.5rem 0 0.8rem', color: '#c3d1ff' }}>Target Future Goals:</h4>
+                <div className="goal-grid">
+                  {/* Gemini Recommended Custom Card */}
+                  {predictedGoal && !GOAL_ITEMS.some(g => g.id === predictedGoal) && (
+                    <button
+                      type="button"
+                      className={`tag-card active goal-card-connected`}
+                      onClick={() => { setSelectedGoal(predictedGoal); setCustomGoal(''); }}
+                      style={{ border: '2px solid var(--blue)' }}
+                    >
+                      <div className="tag-card-content">
+                        <span className="connected-badge" style={{ background: 'rgba(59, 130, 246, 0.1)', color: 'var(--blue)' }}>
+                          ✨ Gemini Recommended
+                        </span>
+                        <span className="tag-icon">🚀</span>
+                        <span className="tag-label">{predictedGoal}</span>
+                      </div>
+                    </button>
+                  )}
+                  {GOAL_ITEMS.map(goal => {
+                    const isSelected = (customGoal ? customGoal === goal.id : selectedGoal === goal.id);
+                    const isConnected = connectedGoalIds.has(goal.id) || predictedGoal === goal.id;
+                    return (
+                      <button
+                        key={goal.id}
+                        type="button"
+                        className={`tag-card${isSelected ? ' active' : ''}${isConnected ? ' goal-card-connected' : ''}`}
+                        onClick={() => { setSelectedGoal(goal.id); setCustomGoal(''); }}
+                      >
+                        <div className="tag-card-content">
+                          {isConnected && (
+                            <span className="connected-badge">
+                              {predictedGoal === goal.id ? '✨ Gemini Suggested' : '⚡ Skill Connected'}
+                            </span>
+                          )}
+                          <span className="tag-icon">{goal.icon}</span>
+                          <span className="tag-label">{goal.label}</span>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Skills-to-Jobs Connection Feature */}
+                <div className="jobs-section" style={{ marginTop: '1.25rem' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <span style={{ fontSize: '1.25rem' }}>💼</span>
+                      <strong style={{ fontSize: '1rem', color: '#76f5ff' }}>
+                        Job Roles & Careers Unlocked by Your Selected Skills:
+                      </strong>
+                    </div>
+                    <span style={{ fontSize: '0.8rem', color: 'var(--muted)' }}>
+                      Market Demand & Compensation
+                    </span>
+                  </div>
+
+                  <div className="jobs-grid">
+                    {displayJobs.map(job => (
+                      <div key={job.title} className="job-card">
+                        <div>
+                          <div className="job-card-head">
+                            <h5 className="job-title">{job.title}</h5>
+                            <span className="job-match">{job.matchScore}% Match</span>
+                          </div>
+                          <span style={{ fontSize: '0.78rem', color: '#8da9ff', display: 'block', marginTop: '0.2rem' }}>
+                            {job.demand}
+                          </span>
+                        </div>
+
+                        <div className="job-salary">
+                          💰 {job.salary}
+                        </div>
+
+                        <div>
+                          <span style={{ fontSize: '0.75rem', color: 'var(--muted)', display: 'block', marginBottom: '0.3rem' }}>
+                            Matching Skills:
+                          </span>
+                          <div className="job-skills-list">
+                            {job.skills.map(s => (
+                              <span key={s} className="job-skill-badge" style={{ borderColor: selectedAreas.includes(s) ? '#76f5ff' : 'transparent', color: selectedAreas.includes(s) ? '#76f5ff' : '#b5c7ff' }}>
+                                {s}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Structured Learning Courses Unlocked */}
+                <div className="jobs-section" style={{ marginTop: '1rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.8rem' }}>
+                    <span style={{ fontSize: '1.25rem' }}>📚</span>
+                    <strong style={{ fontSize: '1rem', color: 'var(--blue)' }}>
+                      Personalized Courses Unlocked by Your Selected Skills:
+                    </strong>
+                  </div>
+                  <div className="jobs-grid">
+                    {selectedAreas.map(area => {
+                      const match = COURSE_MAPPING[area];
+                      if (!match) return null;
+                      return (
+                        <div key={area} className="job-card" style={{ gap: '0.5rem' }}>
+                          <div className="job-card-head" style={{ marginBottom: 0 }}>
+                            <h5 className="job-title" style={{ fontSize: '0.95rem' }}>{match.icon} {match.title}</h5>
+                            <span className="job-match" style={{ background: 'rgba(37, 99, 235, 0.1)', color: 'var(--blue)' }}>Core</span>
+                          </div>
+                          <p style={{ margin: 0, fontSize: '0.82rem', color: 'var(--muted)' }}>
+                            <strong>Current Unit:</strong> {match.current}
+                          </p>
+                          <p style={{ margin: 0, fontSize: '0.82rem', color: 'var(--muted)' }}>
+                            <strong>Next Unit:</strong> {match.next}
+                          </p>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Skill-to-Goal Synergy Connection Explanation Box */}
+                {selectedGoal && (
+                  <div className="synergy-box" style={{ marginTop: '1rem' }}>
+                    <div className="synergy-title">
+                      <span>🔗 SKILLS TO GOAL CONNECTION SYNERGY</span>
+                    </div>
+                    <p style={{ margin: 0, color: 'var(--text)', fontSize: '0.92rem', lineHeight: '1.5' }}>
+                      Your top skills (<b>{selectedAreas.slice(0, 3).join(', ')}</b>) form a direct roadmap to achieve <b>&ldquo;{selectedGoal}&rdquo;</b>.
+                    </p>
+                    <div style={{ display: 'grid', gap: '0.4rem' }}>
+                      {selectedAreas.slice(0, 3).map(area => {
+                        const conn = CONNECTIONS[area];
+                        return (
+                          <div key={area} style={{ fontSize: '0.85rem', color: '#c3d1ff', display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                            <span>{conn?.icon || '⚡'}</span>
+                            <span><b>{area}:</b> {conn?.synergy || 'Directly accelerates your goal roadmap.'}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                <label style={{ marginTop: '1.25rem' }}>Or write your custom future goal</label>
+                <input
+                  className="onboard-input"
+                  type="text"
+                  placeholder="e.g. Master Full Stack + Prompt Engineering & Quantum AI"
+                  value={customGoal}
+                  onChange={e => setCustomGoal(e.target.value)}
+                />
+                
+                <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1rem' }}>
+                  <button type="button" className="back-btn" onClick={() => setStep(2)}>
+                    ← Back
+                  </button>
+                  <button className="primary-btn full" onClick={handleStep3}>
+                    Continue to Daily Schedule →
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         )}
 
@@ -577,7 +962,7 @@ export default function OnboardingPage({ onComplete }) {
         {step === 4 && (
           <div className="onboard-card">
             <h3 style={{ margin: 0 }}>How much time can you invest every day?</h3>
-            <p style={{ color: 'rgba(255,255,255,0.7)', margin: '0.2rem 0 0', fontSize: '0.88rem' }}>
+            <p style={{ color: 'var(--muted)', margin: '0.2rem 0 0', fontSize: '0.88rem' }}>
               Search or type your daily available time commitment.
             </p>
 
@@ -600,7 +985,7 @@ export default function OnboardingPage({ onComplete }) {
 
             {/* Dynamic Filtered Search Suggestions */}
             <div>
-              <span style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.6)', display: 'block', marginBottom: '0.4rem' }}>
+              <span style={{ fontSize: '0.8rem', color: 'var(--muted)', display: 'block', marginBottom: '0.4rem' }}>
                 Search Suggestions / Quick Select:
               </span>
               <div className="availability-grid">
@@ -620,18 +1005,11 @@ export default function OnboardingPage({ onComplete }) {
               </div>
             </div>
 
-            <h4 style={{ margin: '0.75rem 0 0' }}>Preferred time slots</h4>
-            <div className="availability-grid">
-              {['Morning', 'Afternoon', 'Evening', 'Night'].map(s => (
-                <button key={s} type="button" className={`pill-card${selectedSlots.includes(s) ? ' active' : ''}`} onClick={() => toggleSlot(s)}>{s}</button>
-              ))}
-            </div>
-
-            <div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.75rem' }}>
+            <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1.25rem' }}>
               <button type="button" className="back-btn" onClick={() => setStep(3)}>
                 ← Back
               </button>
-              <button className="primary-btn full" onClick={handleStep4} disabled={!selectedTime || selectedSlots.length === 0}>
+              <button className="primary-btn full" onClick={handleStep4} disabled={!selectedTime}>
                 Synthesize Life OS →
               </button>
             </div>

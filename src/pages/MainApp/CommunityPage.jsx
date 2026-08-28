@@ -18,7 +18,7 @@ export default function CommunityPage() {
         {GROUPS.map(g => (
           <article key={g.name}>
             <h3 style={{ margin: 0 }}>{g.name}</h3>
-            <p style={{ color: 'rgba(255,255,255,0.7)', margin: '0.4rem 0' }}>{g.members} members · {g.desc}</p>
+            <p style={{ color: 'var(--muted)', margin: '0.4rem 0' }}>{g.members} members · {g.desc}</p>
             <button className="ghost-btn">Join</button>
           </article>
         ))}

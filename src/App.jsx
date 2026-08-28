@@ -50,9 +50,9 @@ export default function App() {
     case 'register':
       return <RegisterPage onGoLogin={() => goTo('login')} onRegisterSuccess={() => goTo('terms')} />;
     case 'terms':
-      return <TermsPage onAccept={() => goTo('onboarding')} onDecline={() => alert('You can review the policy and continue when ready.')} />;
+      return <TermsPage onAccept={() => goTo('onboarding')} onDecline={() => alert('You can review the policy and continue when ready.')} onBack={() => goTo('register')} />;
     case 'onboarding':
-      return <OnboardingPage onComplete={() => goTo('app')} />;
+      return <OnboardingPage onComplete={() => goTo('app')} onBack={() => goTo('terms')} />;
     case 'app':
       return <MainApp onLogout={handleLogout} />;
     default:

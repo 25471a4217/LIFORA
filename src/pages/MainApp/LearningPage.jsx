@@ -115,6 +115,25 @@ const ALL_VIDEO_LESSONS = [
 
 const CATEGORIES = ['All Topics', 'My Selected Topics', 'AI', 'Python', 'Full Stack', 'Prompt Engineering', 'Quantum Computing', 'Flutter', 'Java', 'Web Development', 'Business'];
 
+const COURSE_MATERIALS = {
+  python: [
+    { name: 'Python Cheat Sheet (PDF)', url: 'https://perso.limsi.fr/pointal/_media/python:cours:mementopython3-english.pdf' },
+    { name: 'Official Documentation', url: 'https://docs.python.org/3/' }
+  ],
+  ai: [
+    { name: 'Machine Learning Cheat Sheet', url: 'https://github.com/soulmachine/machine-learning-cheat-sheet' },
+    { name: 'Kaggle Intro Course', url: 'https://www.kaggle.com/learn/intro-to-machine-learning' }
+  ],
+  flutter: [
+    { name: 'Flutter Codelabs', url: 'https://docs.flutter.dev/get-started/codelabs' },
+    { name: 'Dart Language Tour', url: 'https://dart.dev/guides/language/language-tour' }
+  ],
+  business: [
+    { name: 'Y Combinator Startup School', url: 'https://www.startupschool.org/' },
+    { name: 'Paul Graham Essays', url: 'http://www.paulgraham.com/articles.html' }
+  ]
+};
+
 export default function LearningPage({ onOpenCourse }) {
   const { state } = useApp();
   const [selectedCategory, setSelectedCategory] = useState('My Selected Topics');
@@ -156,7 +175,7 @@ export default function LearningPage({ onOpenCourse }) {
         <div>
           <span className="eyebrow">Learning Hub & Video Academy</span>
           <h2 style={{ margin: 0 }}>Explore Knowledge & Video Tutorials</h2>
-          <p style={{ color: 'rgba(255,255,255,0.7)', margin: '0.3rem 0 0', fontSize: '0.9rem' }}>
+          <p style={{ color: 'var(--muted)', margin: '0.3rem 0 0', fontSize: '0.9rem' }}>
             Video lessons curated specifically for your selected topics: <strong>{userFocus.slice(0, 4).join(', ')}</strong>
           </p>
         </div>
@@ -180,9 +199,9 @@ export default function LearningPage({ onOpenCourse }) {
             style={{
               padding: '0.5rem 1.2rem',
               borderRadius: '999px',
-              border: selectedCategory === cat ? '1px solid #86b7ff' : '1px solid rgba(255,255,255,0.1)',
-              background: selectedCategory === cat ? 'linear-gradient(135deg, rgba(51,93,209,0.4), rgba(141,92,247,0.3))' : 'rgba(255,255,255,0.04)',
-              color: selectedCategory === cat ? '#ffffff' : 'rgba(255,255,255,0.8)',
+              border: selectedCategory === cat ? '1px solid #86b7ff' : '1px solid var(--border)',
+              background: selectedCategory === cat ? 'linear-gradient(135deg, rgba(51,93,209,0.4), rgba(141,92,247,0.3))' : 'rgba(0, 0, 0, 0.04)',
+              color: selectedCategory === cat ? '#ffffff' : 'var(--text)',
               fontWeight: selectedCategory === cat ? '600' : '400',
               cursor: 'pointer',
               transition: 'all 0.2s ease'
@@ -202,11 +221,33 @@ export default function LearningPage({ onOpenCourse }) {
           <article key={course.id} className={`course-card${course.locked ? ' locked' : ''}`}>
             <span className="eyebrow">{course.title}</span>
             <h3>{course.progress}% complete</h3>
-            <p style={{ color: 'rgba(255,255,255,0.7)', margin: '0 0 0.4rem' }}>Current: {course.current}</p>
-            <p style={{ color: 'rgba(255,255,255,0.7)', margin: '0 0 1rem' }}>
+            <p style={{ color: 'var(--muted)', margin: '0 0 0.4rem' }}>Current: {course.current}</p>
+            <p style={{ color: 'var(--muted)', margin: '0 0 1.2rem' }}>
               {course.locked ? 'Locked until core skills improve' : `Next: ${course.next}`}
             </p>
-            <button className="ghost-btn" onClick={() => !course.locked && onOpenCourse()} disabled={course.locked}>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '1.2rem', padding: '0.8rem', borderRadius: '12px', background: 'rgba(0, 0, 0, 0.02)', border: '1px solid rgba(0, 0, 0, 0.06)' }}>
+              <span style={{ fontSize: '0.78rem', color: 'rgba(0, 0, 0, 0.4)', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.05em' }}>📚 Course Materials</span>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+                {(COURSE_MATERIALS[course.id] || [
+                  { name: `${course.title} Documentation Guide (PDF)`, url: 'https://github.com' },
+                  { name: 'Core Concept Reference Manual', url: 'https://google.com' }
+                ]).map((m, idx) => (
+                  <a 
+                    key={idx} 
+                    href={m.url} 
+                    target="_blank" 
+                    rel="noreferrer" 
+                    style={{ fontSize: '0.8rem', color: 'var(--blue)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <span>🔗</span> <span className="hover-underline">{m.name}</span>
+                  </a>
+                ))}
+              </div>
+            </div>
+
+            <button className="ghost-btn" onClick={() => !course.locked && onOpenCourse(course.id)} disabled={course.locked}>
               {course.locked ? 'Locked 🔒' : 'Open Course →'}
             </button>
           </article>
@@ -230,8 +271,8 @@ export default function LearningPage({ onOpenCourse }) {
         </div>
 
         {filteredVideos.length === 0 ? (
-          <div style={{ padding: '3rem', textAlign: 'center', background: 'rgba(255,255,255,0.02)', borderRadius: '20px', marginTop: '1rem' }}>
-            <p style={{ color: 'rgba(255,255,255,0.6)' }}>No video tutorials found for this selection. Try choosing "All Topics" or searching another keyword.</p>
+          <div style={{ padding: '3rem', textAlign: 'center', background: 'rgba(0, 0, 0, 0.02)', borderRadius: '20px', marginTop: '1rem' }}>
+            <p style={{ color: 'var(--muted)' }}>No video tutorials found for this selection. Try choosing "All Topics" or searching another keyword.</p>
           </div>
         ) : (
           <div className="video-grid">
@@ -260,13 +301,13 @@ export default function LearningPage({ onOpenCourse }) {
                   <div>
                     <span className="video-topic-tag">🏷️ {video.topic}</span>
                     <h4 className="video-title">{video.title}</h4>
-                    <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.82rem', margin: '0 0 0.8rem' }}>
+                    <p style={{ color: 'var(--muted)', fontSize: '0.82rem', margin: '0 0 0.8rem' }}>
                       {video.description}
                     </p>
                   </div>
                   <div className="video-meta">
                     <span>📺 {video.channel}</span>
-                    <span style={{ background: 'rgba(255,255,255,0.08)', padding: '0.15rem 0.5rem', borderRadius: '4px', fontSize: '0.75rem' }}>
+                    <span style={{ background: 'var(--border)', padding: '0.15rem 0.5rem', borderRadius: '4px', fontSize: '0.75rem' }}>
                       {video.level}
                     </span>
                   </div>
@@ -284,7 +325,7 @@ export default function LearningPage({ onOpenCourse }) {
           onClose={() => setActiveVideo(null)}
           footer={
             <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
-              <span style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.85rem' }}>
+              <span style={{ color: 'var(--muted)', fontSize: '0.85rem' }}>
                 Channel: <strong>{activeVideo.channel}</strong> • Level: <strong>{activeVideo.level}</strong>
               </span>
               <button className="primary-btn" onClick={() => setActiveVideo(null)}>Done Watching</button>
@@ -304,9 +345,9 @@ export default function LearningPage({ onOpenCourse }) {
             <div>
               <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', margin: '0.5rem 0' }}>
                 <span className="chip">Topic: {activeVideo.topic}</span>
-                <span className="chip" style={{ background: 'rgba(255,255,255,0.06)', color: '#fff' }}>Duration: {activeVideo.duration}</span>
+                <span className="chip" style={{ background: 'rgba(0, 0, 0, 0.06)', color: '#fff' }}>Duration: {activeVideo.duration}</span>
               </div>
-              <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: '0.92rem', lineHeight: '1.5' }}>
+              <p style={{ color: 'var(--text)', fontSize: '0.92rem', lineHeight: '1.5' }}>
                 {activeVideo.description}
               </p>
             </div>

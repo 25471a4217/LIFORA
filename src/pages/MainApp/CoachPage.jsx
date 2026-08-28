@@ -94,13 +94,39 @@ Executing 45 minutes of focused development right now directly accelerates your 
 }
 
 // Career Support Response Generator
-function generateAIReply(prompt) {
+function generateAIReply(prompt, selectedSkills = [], mainGoal = '') {
   const detected = analyzeEmotion(prompt);
   if (detected) {
     return { emotion: detected, text: detected.response };
   }
 
   const lower = prompt.toLowerCase();
+
+  // Check if requesting custom roadmap or study plan
+  if (lower.includes('roadmap') || lower.includes('study plan') || lower.includes('guide')) {
+    const goalTitle = mainGoal || 'your target career';
+    const skillsList = selectedSkills.length > 0 ? selectedSkills : ['Python Development', 'Data Science', 'Machine Learning'];
+    
+    return {
+      emotion: { mood: 'Goal Focused 🎯', activity: null },
+      text: `### 🚀 Custom Roadmap: ${goalTitle}
+
+#### Current Action → Near-Future Progress → Meaningful Result
+If you build 1 small hands-on task today in **${skillsList[0]}** (**Current Action**), you will compile a solid practical portfolio prototype (**Near-Future Progress**), accelerating your journey towards achieving your goal: **${goalTitle}** (**Meaningful Result**).
+
+#### 1. Key Skill Focus Areas
+Based on your onboarding selections, your roadmap is designed around these priority skills:
+${skillsList.map((skill, index) => `- **${skill}**: Directly integrates with your career roadmap and supports learning progression.`).join('\n')}
+
+#### 2. Specialized Roadmap & Study Milestones
+- **Beginner Phase (Weeks 1–3)**: Core concepts of **${skillsList[0] || 'your core skills'}** and **${skillsList[1] || 'your supportive skills'}**. Work on basic configurations and setup. *(Est. 15 hrs)*
+- **Intermediate Phase (Weeks 4–8)**: Integration of **${skillsList[2] || 'secondary focus'}** and building small full-stack components, APIs or scripts using standard frameworks. *(Est. 30 hrs)*
+- **Advanced Phase (Weeks 9–12)**: Mastering advanced systems orchestration, architecture pipelines, deployment, optimization, and capstone project delivery. *(Est. 40 hrs)*
+
+#### 3. Action Check-in
+Nice! Brain warm-up complete 😄. Now let me ask: what is the easiest 5-minute action you can take on this roadmap right now?`
+    };
+  }
 
   if (lower.includes('prompt engineer') || lower.includes('ai architect')) {
     return {
@@ -408,7 +434,7 @@ function ContinuousGameCategoryCard({ category, onSolveReward }) {
   }
 
   return (
-    <article className="insight-card" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', border: isSolved ? '1px solid rgba(70,236,180,0.5)' : '1px solid rgba(255,255,255,0.08)', position: 'relative' }}>
+    <article className="insight-card" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', border: isSolved ? '1px solid rgba(70,236,180,0.5)' : '1px solid var(--border)', position: 'relative' }}>
       <div>
         {/* Header Badges */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.8rem', flexWrap: 'wrap', gap: '0.5rem' }}>
@@ -430,7 +456,7 @@ function ContinuousGameCategoryCard({ category, onSolveReward }) {
         <h4 style={{ margin: '0 0 0.8rem', fontSize: '1.2rem', color: '#f1f5f9' }}>{category.name}</h4>
 
         {/* Dynamic Question Prompt */}
-        <div style={{ background: 'rgba(255,255,255,0.03)', padding: '1rem', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.08)', marginBottom: '1rem' }}>
+        <div style={{ background: 'rgba(255,255,255,0.03)', padding: '1rem', borderRadius: '10px', border: '1px solid var(--border)', marginBottom: '1rem' }}>
           <p style={{ margin: 0, fontSize: '1rem', lineHeight: '1.6', fontWeight: 600, color: '#f1f5f9' }}>
             {questionData.question}
           </p>
@@ -464,8 +490,8 @@ function ContinuousGameCategoryCard({ category, onSolveReward }) {
                   textAlign: 'left',
                   fontSize: '0.88rem',
                   padding: '0.7rem 1rem',
-                  background: selectedOpt === idx ? (idx === questionData.answer ? 'rgba(70,236,180,0.2)' : 'rgba(255,118,118,0.2)') : 'rgba(255,255,255,0.04)',
-                  borderColor: selectedOpt === idx ? (idx === questionData.answer ? '#46ecb4' : '#ff7676') : 'rgba(255,255,255,0.08)',
+                  background: selectedOpt === idx ? (idx === questionData.answer ? 'rgba(70,236,180,0.2)' : 'rgba(255,118,118,0.2)') : 'rgba(0, 0, 0, 0.04)',
+                  borderColor: selectedOpt === idx ? (idx === questionData.answer ? '#46ecb4' : '#ff7676') : 'var(--border)',
                 }}
               >
                 {opt}
@@ -511,8 +537,8 @@ function ContinuousGameCategoryCard({ category, onSolveReward }) {
       </div>
 
       {/* Footer Controls: Continuous Auto-Play & Next Question */}
-      <div style={{ marginTop: '1.2rem', paddingTop: '0.8rem', borderTop: '1px solid rgba(255,255,255,0.08)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.8rem' }}>
-        <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.78rem', color: 'rgba(255,255,255,0.7)', cursor: 'pointer' }}>
+      <div style={{ marginTop: '1.2rem', paddingTop: '0.8rem', borderTop: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.8rem' }}>
+        <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.78rem', color: 'var(--muted)', cursor: 'pointer' }}>
           <input
             type="checkbox"
             checked={autoAdvance}
@@ -599,7 +625,7 @@ export default function CoachPage() {
     setInput('');
 
     setTimeout(() => {
-      const reply = generateAIReply(msg);
+      const reply = generateAIReply(msg, state.user?.focusAreas || state.selectedAreas || [], state.user?.mainGoal || state.mainGoal);
       if (reply.emotion?.mood) {
         setDetectedMood(reply.emotion.mood);
       }
@@ -626,14 +652,14 @@ export default function CoachPage() {
         <div>
           <span className="eyebrow">EMOTIONALLY INTELLIGENT AI ASSISTANT</span>
           <h2 style={{ margin: 0 }}>AI Coach & Continuous Infinite Game Arcade</h2>
-          <p style={{ color: 'rgba(255,255,255,0.7)', margin: '0.3rem 0 0', maxWidth: '640px' }}>
+          <p style={{ color: 'var(--muted)', margin: '0.3rem 0 0', maxWidth: '640px' }}>
             Understands your mood and study goals. One solved question automatically leads to another fresh, non-repeating question for continuous momentum!
           </p>
         </div>
 
         {/* Emotion Indicator Pill */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', background: 'var(--surface-strong)', padding: '0.6rem 1.2rem', borderRadius: '14px', border: '1px solid rgba(255,255,255,0.1)' }}>
-          <span style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Detected Mood:</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', background: 'var(--surface-strong)', padding: '0.6rem 1.2rem', borderRadius: '14px', border: '1px solid var(--border)' }}>
+          <span style={{ fontSize: '0.8rem', color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Detected Mood:</span>
           <strong style={{ color: '#76f5ff', fontSize: '0.95rem' }}>{detectedMood}</strong>
         </div>
       </div>
@@ -643,14 +669,14 @@ export default function CoachPage() {
         <button
           className={`primary-btn ${activeTab === 'chat' ? '' : 'secondary-btn'}`}
           onClick={() => setActiveTab('chat')}
-          style={{ background: activeTab === 'chat' ? 'linear-gradient(135deg, #5d8bff, #8d5cf7)' : 'rgba(255,255,255,0.06)' }}
+          style={{ background: activeTab === 'chat' ? 'linear-gradient(135deg, #5d8bff, #8d5cf7)' : 'rgba(0, 0, 0, 0.06)' }}
         >
           💬 AI Coach Chat
         </button>
         <button
           className={`primary-btn ${activeTab === 'reset' ? '' : 'secondary-btn'}`}
           onClick={() => setActiveTab('reset')}
-          style={{ background: activeTab === 'reset' ? 'linear-gradient(135deg, #5d8bff, #8d5cf7)' : 'rgba(255,255,255,0.06)' }}
+          style={{ background: activeTab === 'reset' ? 'linear-gradient(135deg, #5d8bff, #8d5cf7)' : 'rgba(0, 0, 0, 0.06)' }}
         >
           🎮 Continuous Infinite Game Arcade ({totalSolved} Solved)
         </button>
@@ -661,7 +687,7 @@ export default function CoachPage() {
           {/* Quick Emotion Check-ins & Prompt Pills */}
           <article className="coach-panel">
             <div className="status-pill"><span className="online" />AI Mindset & Emotion Engine Online</div>
-            <p style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.7)', margin: '0.8rem 0 0.5rem' }}>Express Your Current State:</p>
+            <p style={{ fontSize: '0.85rem', color: 'var(--muted)', margin: '0.8rem 0 0.5rem' }}>Express Your Current State:</p>
             <div className="prompt-grid">
               <button className="prompt-pill" onClick={() => sendMessage("I'm feeling really overwhelmed by my workload and deadlines")}>
                 🤯 Overwhelmed & Stressed
@@ -675,11 +701,11 @@ export default function CoachPage() {
               <button className="prompt-pill" onClick={() => sendMessage("I'm stuck on a really frustrating bug in my code")}>
                 🧩 Stuck & Frustrated
               </button>
-              <button className="prompt-pill" onClick={() => sendMessage("🎯 Prompt Engineer & AI Architect Roadmap")}>
-                🎯 Prompt Engineer Roadmap
+              <button className="prompt-pill" onClick={() => sendMessage(`🎯 Roadmap for ${state.user?.mainGoal || state.mainGoal || 'Become an AI Architect'}`)}>
+                🎯 My Goal Roadmap
               </button>
-              <button className="prompt-pill" onClick={() => sendMessage("💻 Full Stack Web Development Guide")}>
-                💻 Full Stack Web Dev Guide
+              <button className="prompt-pill" onClick={() => sendMessage(`📚 Study Plan for ${state.user?.focusAreas?.[0] || state.selectedAreas?.[0] || 'Python'}`)}>
+                📚 My Core Skill Plan
               </button>
             </div>
           </article>
@@ -716,19 +742,19 @@ export default function CoachPage() {
               <div>
                 <span className="eyebrow" style={{ color: '#76f5ff' }}>DYNAMIC CONTINUOUS GAMEPLAY ENGINE</span>
                 <h3 style={{ margin: '0.2rem 0' }}>Infinite Question Supply • Never-Ending Arcade</h3>
-                <p style={{ margin: 0, fontSize: '0.85rem', color: 'rgba(255,255,255,0.7)' }}>
+                <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--muted)' }}>
                   Solving a question automatically generates a fresh, unique question in that category. Keep playing as long as you like!
                 </p>
               </div>
 
               <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', background: 'rgba(0,0,0,0.3)', padding: '0.8rem 1.4rem', borderRadius: '12px' }}>
                 <div style={{ textAlign: 'center' }}>
-                  <span style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.6)', display: 'block' }}>TOTAL SOLVED</span>
+                  <span style={{ fontSize: '0.75rem', color: 'var(--muted)', display: 'block' }}>TOTAL SOLVED</span>
                   <strong style={{ fontSize: '1.4rem', color: '#76f5ff' }}>{totalSolved}</strong>
                 </div>
-                <div style={{ width: '1px', height: '30px', background: 'rgba(255,255,255,0.1)' }} />
+                <div style={{ width: '1px', height: '30px', background: 'var(--border)' }} />
                 <div style={{ textAlign: 'center' }}>
-                  <span style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.6)', display: 'block' }}>SESSION XP</span>
+                  <span style={{ fontSize: '0.75rem', color: 'var(--muted)', display: 'block' }}>SESSION XP</span>
                   <strong style={{ fontSize: '1.4rem', color: '#46ecb4' }}>+{totalSolved * 20} XP</strong>
                 </div>
               </div>
@@ -747,7 +773,7 @@ export default function CoachPage() {
       {/* Career Plan Modal */}
       {planModal && (
         <Modal title="AI Wellness & Performance Plan" onClose={() => setPlanModal(false)} footer={<button className="primary-btn" onClick={() => setPlanModal(false)}>Got it</button>}>
-          <p style={{ lineHeight: '1.6', color: 'rgba(255,255,255,0.9)' }}>
+          <p style={{ lineHeight: '1.6', color: 'var(--text)' }}>
             LIFORA recommends keeping a healthy balance: 50% deep work sprints, 30% active skill building, and 20% dedicated mood resets and physical recovery.
           </p>
         </Modal>

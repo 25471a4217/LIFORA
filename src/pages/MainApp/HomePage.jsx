@@ -28,22 +28,22 @@ export default function HomePage({ onNavigate }) {
           <div className="priority-block">
             <span>🔥 DO NOW</span>
             <strong style={{ display: 'block', marginTop: '0.3rem' }}>DSA Practice</strong>
-            <p style={{ margin: '0.2rem 0 0', color: 'rgba(255,255,255,0.7)', fontSize: '0.9rem' }}>High impact + deadline approaching</p>
+            <p style={{ margin: '0.2rem 0 0', color: 'var(--muted)', fontSize: '0.9rem' }}>High impact + deadline approaching</p>
           </div>
           <div className="priority-block secondary">
             <span>⭐ NEXT</span>
             <strong style={{ display: 'block', marginTop: '0.3rem' }}>Python Practice</strong>
-            <p style={{ margin: '0.2rem 0 0', color: 'rgba(255,255,255,0.7)', fontSize: '0.9rem' }}>Strengthen core skills</p>
+            <p style={{ margin: '0.2rem 0 0', color: 'var(--muted)', fontSize: '0.9rem' }}>Strengthen core skills</p>
           </div>
           <div className="priority-block tertiary">
             <span>🕒 LATER</span>
             <strong style={{ display: 'block', marginTop: '0.3rem' }}>AI News</strong>
-            <p style={{ margin: '0.2rem 0 0', color: 'rgba(255,255,255,0.7)', fontSize: '0.9rem' }}>Stay informed with research updates</p>
+            <p style={{ margin: '0.2rem 0 0', color: 'var(--muted)', fontSize: '0.9rem' }}>Stay informed with research updates</p>
           </div>
           <div className="priority-block muted">
             <span>⏸ SKIP TODAY</span>
             <strong style={{ display: 'block', marginTop: '0.3rem' }}>Optional reading</strong>
-            <p style={{ margin: '0.2rem 0 0', color: 'rgba(255,255,255,0.7)', fontSize: '0.9rem' }}>Reserve energy for mission tasks</p>
+            <p style={{ margin: '0.2rem 0 0', color: 'var(--muted)', fontSize: '0.9rem' }}>Reserve energy for mission tasks</p>
           </div>
         </article>
       </div>

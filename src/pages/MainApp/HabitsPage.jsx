@@ -27,7 +27,7 @@ export default function HabitsPage() {
         {habits.map(h => (
           <article key={h.id} className="habit-card">
             <h3 style={{ margin: 0 }}>{h.name}</h3>
-            <p style={{ color: 'rgba(255,255,255,0.7)', margin: 0 }}>🔥 {h.streak} day streak</p>
+            <p style={{ color: 'var(--muted)', margin: 0 }}>🔥 {h.streak} day streak</p>
             <button
               className="ghost-btn"
               onClick={() => complete(h.id)}
