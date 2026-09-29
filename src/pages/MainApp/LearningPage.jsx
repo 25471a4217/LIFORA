@@ -134,15 +134,16 @@ const COURSE_MATERIALS = {
   ]
 };
 
+import { COURSE_MAPPING } from '../OnboardingPage';
+
 export default function LearningPage({ onOpenCourse }) {
   const { state } = useApp();
-  const [selectedCategory, setSelectedCategory] = useState('My Selected Topics');
   const [searchQuery, setSearchQuery] = useState('');
   const [activeVideo, setActiveVideo] = useState(null);
 
   const userFocus = state.user.focusAreas || state.selectedAreas || [];
 
-  // Filter video lessons based on selected category and search query
+  // Filter video lessons to show ONLY user selected focus areas/topics
   const filteredVideos = ALL_VIDEO_LESSONS.filter(video => {
     const matchesSearch = (
       video.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -152,20 +153,20 @@ export default function LearningPage({ onOpenCourse }) {
 
     if (!matchesSearch) return false;
 
-    if (selectedCategory === 'All Topics') return true;
-
-    if (selectedCategory === 'My Selected Topics') {
-      return userFocus.some(f => 
-        video.topic.toLowerCase().includes(f.toLowerCase()) ||
-        f.toLowerCase().includes(video.topic.toLowerCase()) ||
-        video.category.toLowerCase().includes(f.toLowerCase())
-      );
-    }
-
-    return (
-      video.category.toLowerCase() === selectedCategory.toLowerCase() ||
-      video.topic.toLowerCase().includes(selectedCategory.toLowerCase())
+    // Filter strictly by user's focus skills/selected missions
+    return userFocus.some(f => 
+      video.topic.toLowerCase().includes(f.toLowerCase()) ||
+      f.toLowerCase().includes(video.topic.toLowerCase()) ||
+      video.category.toLowerCase().includes(f.toLowerCase())
     );
+  });
+
+  // Filter courses to show ONLY user selected focus areas/topics
+  const filteredCourses = state.courses.filter(course => {
+    return userFocus.some(area => {
+      const match = COURSE_MAPPING[area];
+      return match && match.id === course.id;
+    }) || !state.onboardingComplete;
   });
 
   return (
@@ -174,9 +175,9 @@ export default function LearningPage({ onOpenCourse }) {
       <div className="page-header">
         <div>
           <span className="eyebrow">Learning Hub & Video Academy</span>
-          <h2 style={{ margin: 0 }}>Explore Knowledge & Video Tutorials</h2>
+          <h2 style={{ margin: 0 }}>My Selected Missions - Study Materials</h2>
           <p style={{ color: 'var(--muted)', margin: '0.3rem 0 0', fontSize: '0.9rem' }}>
-            Video lessons curated specifically for your selected topics: <strong>{userFocus.slice(0, 4).join(', ')}</strong>
+            Video lessons and courses curated specifically for your selected missions: <strong>{userFocus.slice(0, 4).join(', ')}</strong>
           </p>
         </div>
         <input 
@@ -189,35 +190,12 @@ export default function LearningPage({ onOpenCourse }) {
         />
       </div>
 
-      {/* Category Pills */}
-      <div className="category-row" style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap', marginBottom: '1.5rem' }}>
-        {CATEGORIES.map(cat => (
-          <button 
-            key={cat} 
-            className={`pill-card ${selectedCategory === cat ? 'active' : ''}`}
-            onClick={() => setSelectedCategory(cat)}
-            style={{
-              padding: '0.5rem 1.2rem',
-              borderRadius: '999px',
-              border: selectedCategory === cat ? '1px solid #86b7ff' : '1px solid var(--border)',
-              background: selectedCategory === cat ? 'linear-gradient(135deg, rgba(51,93,209,0.4), rgba(141,92,247,0.3))' : 'rgba(0, 0, 0, 0.04)',
-              color: selectedCategory === cat ? '#ffffff' : 'var(--text)',
-              fontWeight: selectedCategory === cat ? '600' : '400',
-              cursor: 'pointer',
-              transition: 'all 0.2s ease'
-            }}
-          >
-            {cat === 'My Selected Topics' ? '⭐ My Selected Topics' : cat}
-          </button>
-        ))}
-      </div>
-
       {/* Recommended Interactive Courses */}
       <div className="section-title" style={{ margin: '1rem 0 0.8rem' }}>
-        <h3 style={{ margin: 0, fontSize: '1.2rem', color: '#eef3ff' }}>Structured Learning Modules</h3>
+        <h3 style={{ margin: 0, fontSize: '1.2rem', color: '#eef3ff' }}>Structured Mission Modules</h3>
       </div>
       <div className="course-grid">
-        {state.courses.map(course => (
+        {filteredCourses.map(course => (
           <article key={course.id} className={`course-card${course.locked ? ' locked' : ''}`}>
             <span className="eyebrow">{course.title}</span>
             <h3>{course.progress}% complete</h3>
@@ -260,19 +238,17 @@ export default function LearningPage({ onOpenCourse }) {
           <div>
             <span className="eyebrow" style={{ color: '#86b7ff' }}>CURATED VIDEO TUTORIALS</span>
             <h3 style={{ margin: '0.2rem 0 0', fontSize: '1.3rem' }}>
-              Videos for "{selectedCategory}" ({filteredVideos.length})
+              Videos for My Selected Missions ({filteredVideos.length})
             </h3>
           </div>
-          {selectedCategory === 'My Selected Topics' && (
-            <span className="chip" style={{ fontSize: '0.8rem' }}>
-              🎯 Personal OS Recommendation
-            </span>
-          )}
+          <span className="chip" style={{ fontSize: '0.8rem' }}>
+            🎯 Personal OS Recommendation
+          </span>
         </div>
 
         {filteredVideos.length === 0 ? (
           <div style={{ padding: '3rem', textAlign: 'center', background: 'rgba(0, 0, 0, 0.02)', borderRadius: '20px', marginTop: '1rem' }}>
-            <p style={{ color: 'var(--muted)' }}>No video tutorials found for this selection. Try choosing "All Topics" or searching another keyword.</p>
+            <p style={{ color: 'var(--muted)' }}>No video tutorials found for your selected focus areas. Try searching another keyword.</p>
           </div>
         ) : (
           <div className="video-grid">

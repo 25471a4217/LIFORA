@@ -298,45 +298,80 @@ export default function SkillGalaxyPage() {
               </div>
             ))}
 
-            {/* Skills planets rendering */}
+            {/* Skills topics rendering (replacing planets) */}
             {skills.map(item => {
               const layout = PLANET_LAYOUTS[item.id] || { left: '50%', top: '50%', sizeMultiplier: 1.0 };
-              // Calculate planet diameter based on level: Level 1 = 55px, Level 5 = 115px
-              const baseDiameter = 55 + (item.level - 1) * 15;
-              const diameter = Math.round(baseDiameter * layout.sizeMultiplier);
               const isActive = selectedPlanet === item.id;
+              
+              // Check if the user selected this topic in onboarding / focus areas
+              const isSelectedTopic = state.selectedAreas?.includes(item.name) || 
+                                      state.selectedAreas?.includes(item.id) || 
+                                      (item.id === 'ai' && state.selectedAreas?.includes('AI & ML')) ||
+                                      (item.id === 'ai' && state.selectedAreas?.includes('AI & Machine Learning')) ||
+                                      (item.id === 'business' && state.selectedAreas?.includes('Entrepreneurship')) ||
+                                      (item.id === 'html' && state.selectedAreas?.includes('HTML & CSS'));
 
               return (
                 <div 
                   key={item.id}
-                  className="planet-wrapper"
+                  className={`topic-wrapper${isActive ? ' active' : ''}${isSelectedTopic ? ' user-selected-topic' : ''}`}
                   style={{ left: layout.left, top: layout.top }}
                   onClick={() => setSelectedPlanet(item.id)}
                 >
                   <div 
-                    className="planet-sphere"
+                    className="topic-visual-card"
                     style={{
-                      width: `${diameter}px`,
-                      height: `${diameter}px`,
-                      background: item.theme,
-                      border: isActive ? '3px solid #76f5ff' : '1px solid rgba(255,255,255,0.2)',
-                      boxShadow: isActive ? `0 0 25px ${item.theme.split(', ')[1]?.replace(')', '')}` : 'none'
+                      border: isActive ? '2px solid #76f5ff' : isSelectedTopic ? '2px dashed #a78bfa' : '1px solid rgba(255,255,255,0.1)',
+                      boxShadow: isActive ? '0 0 25px rgba(118,245,255,0.4)' : isSelectedTopic ? '0 0 15px rgba(167,139,250,0.2)' : 'none'
                     }}
                   >
-                    <span>{item.icon}</span>
-                    {/* Evolved rings for Level 3+ planets */}
-                    {item.level >= 3 && (
-                      <div className={`planet-rings${isActive ? ' glow' : ''}`} />
-                    )}
+                    {/* Unique Animated Picture / Visual related to the topic */}
+                    <div className={`topic-anim-picture topic-${item.id}`}>
+                      {item.id === 'python' && (
+                        <div className="python-anim">
+                          <span className="python-snake">🐍</span>
+                          <div className="code-dots"><span/><span/><span/></div>
+                        </div>
+                      )}
+                      {item.id === 'java' && (
+                        <div className="java-anim">
+                          <span className="steam-particle s1">~</span>
+                          <span className="steam-particle s2">~</span>
+                          <span className="coffee-cup">☕</span>
+                        </div>
+                      )}
+                      {item.id === 'html' && (
+                        <div className="html-anim">
+                          <span className="palette">🎨</span>
+                          <span className="sparkle star1">✦</span>
+                          <span className="sparkle star2">✦</span>
+                        </div>
+                      )}
+                      {item.id === 'communication' && (
+                        <div className="comm-anim">
+                          <div className="wave wave1" />
+                          <div className="wave wave2" />
+                          <span className="chat-bubble">🗣️</span>
+                        </div>
+                      )}
+                      {item.id === 'ai' && (
+                        <div className="ai-anim">
+                          <span className="brain-core">🧠</span>
+                          <div className="synapse-node n1" />
+                          <div className="synapse-node n2" />
+                          <div className="synapse-node n3" />
+                        </div>
+                      )}
+                      {item.id === 'business' && (
+                        <div className="business-anim">
+                          <span className="rocket-icon">🚀</span>
+                          <span className="flame-trail">🔥</span>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                  <span style={{ 
-                    fontSize: '0.78rem', 
-                    color: isActive ? '#76f5ff' : '#a6c0ff', 
-                    fontWeight: 600,
-                    marginTop: '0.35rem',
-                    textShadow: '0 2px 4px rgba(0,0,0,0.8)'
-                  }}>
-                    {item.name} (Lvl {item.level})
+                  <span className="topic-name-label">
+                    {item.name} {isSelectedTopic && '⭐'}
                   </span>
                 </div>
               );

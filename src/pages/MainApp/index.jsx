@@ -12,7 +12,6 @@ import CoursePage from './CoursePage';
 import QuizPage from './QuizPage';
 import CoachPage from './CoachPage';
 import FuturePage from './FuturePage';
-import SkillGalaxyPage from './SkillGalaxyPage';
 import AnalyticsPage from './AnalyticsPage';
 import HabitsPage from './HabitsPage';
 import RewardsPage from './RewardsPage';
@@ -22,7 +21,6 @@ import ProfilePage from './ProfilePage';
 const NAV_ITEMS = [
   { key: 'home', label: 'Dashboard' },
   { key: 'tasks', label: 'My Tasks' },
-  { key: 'galaxy', label: '🌌 Skill Galaxy' },
   { key: 'learning', label: 'Learning & Videos' },
   { key: 'quiz', label: 'Quiz & Practice' },
   { key: 'coach', label: 'AI Study Assistant' },
@@ -85,7 +83,6 @@ export default function MainApp({ onLogout }) {
     switch (page) {
       case 'home':     return <HomePage onNavigate={navigate} />;
       case 'tasks':    return <TasksPage />;
-      case 'galaxy':   return <SkillGalaxyPage />;
       case 'learning': return <LearningPage onOpenCourse={(id) => { setActiveCourseId(id); navigate('course'); }} />;
       case 'course':   return <CoursePage courseId={activeCourseId} onBack={() => navigate('learning')} />;
       case 'quiz':     return <QuizPage onBack={() => navigate('learning')} />;

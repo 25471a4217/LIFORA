@@ -1,4 +1,7 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { getQuestionsForUserTopics } from '../data/quizQuestions';
+
+const INITIAL_FOCUS = ['Full Stack Development', 'Prompt Engineering', 'Quantum Computing', 'AI & Machine Learning', 'Entrepreneurship'];
 
 const INITIAL_STATE = {
   currentView: 'splash',       // splash | login | register | terms | onboarding | app
@@ -12,13 +15,13 @@ const INITIAL_STATE = {
     xp: 2450,
     streak: 14,
     growthScore: 76,
-    focusAreas: ['Full Stack Development', 'Prompt Engineering', 'Quantum Computing', 'AI & ML', 'Entrepreneurship'],
+    focusAreas: INITIAL_FOCUS,
     tasksCompleted: 8,
     dailyCompletion: 65,
     age: '',
     profession: 'Student',
   },
-  selectedAreas: ['Full Stack Development', 'Prompt Engineering', 'Quantum Computing', 'AI & Machine Learning', 'Entrepreneurship'],
+  selectedAreas: INITIAL_FOCUS,
   mainGoal: 'Become a Prompt Engineer & AI Architect',
   selectedTime: '2 Hours',
   timeslots: ['Morning', 'Evening'],
@@ -52,13 +55,8 @@ const INITIAL_STATE = {
     { title: 'Machine Learning', status: 'locked' },
   ],
   quiz: {
-    questions: [
-      { text: 'Which data structure uses FIFO?', options: ['Stack', 'Queue', 'Tree', 'Graph'], answer: 1 },
-      { text: 'What programming language powers most AI libraries?', options: ['Ruby', 'JavaScript', 'Python', 'C++'], answer: 2 },
-      { text: 'Which algorithm is common for shortest path?', options: ['BFS', 'Quicksort', 'DFS', 'Merge Sort'], answer: 0 },
-      { text: 'What does DSA stand for?', options: ['Data System Access', 'Data Structures & Algorithms', 'Development Skills Assessment', 'Dynamic Statistical Analysis'], answer: 1 },
-      { text: 'Which structure is best for LIFO?', options: ['Queue', 'Stack', 'Heap', 'Graph'], answer: 1 },
-    ],
+    activeTopic: 'all',
+    questions: getQuestionsForUserTopics(INITIAL_FOCUS, 5),
     current: 0,
     score: 0,
   },

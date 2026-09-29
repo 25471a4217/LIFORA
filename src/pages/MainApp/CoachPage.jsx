@@ -324,7 +324,7 @@ function generateQuestionForCategory(catId, roundCount) {
       const em = EMOJI_POOL[seed % EMOJI_POOL.length];
       return {
         id: `emoji_${seed}`,
-        type: "reveal",
+        type: "input",
         question: `Emoji Story Round #${seed + 1}: ${em.q}`,
         answer: em.ans,
         clue: em.clue,
@@ -371,8 +371,30 @@ const INFINITE_CATEGORIES = [
   { id: 8, name: "🔑 Code Ciphers (Infinite)", icon: "🔑" },
 ];
 
+function getCategoryForMood(mood) {
+  if (!mood) return null;
+  const moodStr = mood.toLowerCase();
+  
+  if (moodStr.includes('overwhelmed')) {
+    return INFINITE_CATEGORIES.find(c => c.id === 4) || INFINITE_CATEGORIES[3];
+  }
+  if (moodStr.includes('burn') || moodStr.includes('tired')) {
+    return INFINITE_CATEGORIES.find(c => c.id === 7) || INFINITE_CATEGORIES[6];
+  }
+  if (moodStr.includes('distracted') || moodStr.includes('focus')) {
+    return INFINITE_CATEGORIES.find(c => c.id === 5) || INFINITE_CATEGORIES[4];
+  }
+  if (moodStr.includes('stuck') || moodStr.includes('frustrated')) {
+    return INFINITE_CATEGORIES.find(c => c.id === 2) || INFINITE_CATEGORIES[1];
+  }
+  if (moodStr.includes('motivated') || moodStr.includes('energized') || moodStr.includes('ready')) {
+    return INFINITE_CATEGORIES.find(c => c.id === 6) || INFINITE_CATEGORIES[5];
+  }
+  return INFINITE_CATEGORIES.find(c => c.id === 2) || INFINITE_CATEGORIES[1];
+}
+
 // Interactive Continuous Game Component
-function ContinuousGameCategoryCard({ category, onSolveReward }) {
+function ContinuousGameCategoryCard({ category, onSolveReward, onBack }) {
   const [round, setRound] = useState(0);
   const [streak, setStreak] = useState(0);
   const [autoAdvance, setAutoAdvance] = useState(true);
@@ -409,7 +431,17 @@ function ContinuousGameCategoryCard({ category, onSolveReward }) {
   }
 
   function handleInputSubmit() {
-    if (userInput.trim().toUpperCase() === questionData.answer.toUpperCase()) {
+    const cleanUserVal = userInput.trim().toUpperCase();
+    const cleanAnsVal = questionData.answer.toUpperCase();
+    const isExact = cleanUserVal === cleanAnsVal;
+    
+    // For Emoji Guessing, allow matching any major keyword (e.g. "python" for "Python Programming", "ai" for "AI Engineer / Architect", "vite" for "Vite Bundler")
+    const isKeywordMatch = category.id === 7 && (
+      (cleanAnsVal.includes(cleanUserVal) && cleanUserVal.length >= 3) ||
+      (cleanUserVal === "AI")
+    );
+
+    if (isExact || isKeywordMatch) {
       setFeedback(`🎉 Correct! (+20 XP) • Streak: 🔥 ${streak + 1}\n\n${questionData.bridge}`);
       handleCorrectAnswer(20);
     } else {
@@ -439,6 +471,29 @@ function ContinuousGameCategoryCard({ category, onSolveReward }) {
         {/* Header Badges */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.8rem', flexWrap: 'wrap', gap: '0.5rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+            {onBack && (
+              <button 
+                onClick={onBack} 
+                style={{ 
+                  background: 'var(--surface-soft)', 
+                  border: '1px solid var(--border)', 
+                  color: 'var(--text)', 
+                  cursor: 'pointer', 
+                  fontSize: '0.78rem', 
+                  fontWeight: '600',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.3rem',
+                  padding: '0.25rem 0.6rem',
+                  borderRadius: '8px',
+                  transition: 'all 0.2s ease',
+                  marginRight: '0.4rem'
+                }}
+                className="hover-brighten"
+              >
+                ← Back
+              </button>
+            )}
             <span className="eyebrow" style={{ color: '#76f5ff', margin: 0 }}>ROUND #{round + 1}</span>
             {streak > 0 && (
               <span style={{ fontSize: '0.78rem', color: '#ffd166', background: 'rgba(255,209,102,0.15)', padding: '0.2rem 0.6rem', borderRadius: '6px', fontWeight: 700 }}>
@@ -453,11 +508,11 @@ function ContinuousGameCategoryCard({ category, onSolveReward }) {
           )}
         </div>
 
-        <h4 style={{ margin: '0 0 0.8rem', fontSize: '1.2rem', color: '#f1f5f9' }}>{category.name}</h4>
+        <h4 style={{ margin: '0 0 0.8rem', fontSize: '1.2rem', color: 'var(--text)' }}>{category.name}</h4>
 
         {/* Dynamic Question Prompt */}
-        <div style={{ background: 'rgba(255,255,255,0.03)', padding: '1rem', borderRadius: '10px', border: '1px solid var(--border)', marginBottom: '1rem' }}>
-          <p style={{ margin: 0, fontSize: '1rem', lineHeight: '1.6', fontWeight: 600, color: '#f1f5f9' }}>
+        <div style={{ background: 'var(--surface-soft)', padding: '1rem', borderRadius: '10px', border: '1px solid var(--border)', marginBottom: '1rem' }}>
+          <p style={{ margin: 0, fontSize: '1rem', lineHeight: '1.6', fontWeight: 600, color: 'var(--text)' }}>
             {questionData.question}
           </p>
         </div>
@@ -517,11 +572,11 @@ function ContinuousGameCategoryCard({ category, onSolveReward }) {
         {questionData.clue && (
           <div style={{ marginTop: '0.5rem' }}>
             {!clueVisible ? (
-              <button className="ghost-btn" onClick={() => setClueVisible(true)} style={{ fontSize: '0.8rem', color: '#8da9ff', padding: 0 }}>
+              <button className="ghost-btn" onClick={() => setClueVisible(true)} style={{ fontSize: '0.8rem', color: 'var(--blue)', padding: 0 }}>
                 💡 Show Clue
               </button>
             ) : (
-              <p style={{ fontSize: '0.82rem', color: '#8da9ff', margin: '0.3rem 0 0' }}>
+              <p style={{ fontSize: '0.82rem', color: 'var(--blue)', margin: '0.3rem 0 0', fontWeight: 500 }}>
                 💡 Clue: {questionData.clue}
               </p>
             )}
@@ -530,7 +585,18 @@ function ContinuousGameCategoryCard({ category, onSolveReward }) {
 
         {/* Feedback & Natural Task Bridge Display */}
         {feedback && (
-          <div style={{ marginTop: '1rem', padding: '0.9rem', background: 'rgba(118,245,255,0.1)', borderRadius: '10px', border: '1px solid rgba(118,245,255,0.3)', color: '#76f5ff', fontSize: '0.88rem', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>
+          <div style={{ 
+            marginTop: '1rem', 
+            padding: '0.9rem', 
+            background: feedback.startsWith('🎉') ? 'rgba(16, 185, 129, 0.06)' : 'rgba(239, 68, 68, 0.06)', 
+            borderRadius: '10px', 
+            border: feedback.startsWith('🎉') ? '1px solid rgba(16, 185, 129, 0.2)' : '1px solid rgba(239, 68, 68, 0.2)', 
+            color: feedback.startsWith('🎉') ? '#059669' : '#dc2626', 
+            fontSize: '0.88rem', 
+            lineHeight: '1.6', 
+            whiteSpace: 'pre-wrap',
+            fontWeight: 500
+          }}>
             {feedback}
           </div>
         )}
@@ -570,6 +636,7 @@ export default function CoachPage() {
   const [detectedMood, setDetectedMood] = useState('Focused 🎯');
   const [totalSolved, setTotalSolved] = useState(0);
   const [planModal, setPlanModal] = useState(false);
+  const [activeGameCategory, setActiveGameCategory] = useState(null);
   const chatEndRef = useRef(null);
 
   // Breathing Orb State
@@ -628,6 +695,17 @@ export default function CoachPage() {
       const reply = generateAIReply(msg, state.user?.focusAreas || state.selectedAreas || [], state.user?.mainGoal || state.mainGoal);
       if (reply.emotion?.mood) {
         setDetectedMood(reply.emotion.mood);
+        
+        // Suggest a game based on the detected mood and automatically enter the game
+        const matchedCategory = getCategoryForMood(reply.emotion.mood);
+        if (matchedCategory) {
+          reply.text += `\n\n🎮 **Mood Match Arcade**: To help shift your mindset, I suggest playing **${matchedCategory.name}**. Entering the arcade now...`;
+          
+          setTimeout(() => {
+            setActiveTab('reset');
+            setActiveGameCategory(matchedCategory);
+          }, 1400);
+        }
       }
       update({
         chatHistory: [...newHistory, { sender: 'ai', text: reply.text }],
@@ -776,6 +854,24 @@ export default function CoachPage() {
           <p style={{ lineHeight: '1.6', color: 'var(--text)' }}>
             LIFORA recommends keeping a healthy balance: 50% deep work sprints, 30% active skill building, and 20% dedicated mood resets and physical recovery.
           </p>
+        </Modal>
+      )}
+
+      {/* Active Suggested Game Modal */}
+      {activeGameCategory && (
+        <Modal 
+          title={`🎮 Playing: ${activeGameCategory.name}`} 
+          onClose={() => setActiveGameCategory(null)} 
+          footer={<button className="secondary-btn" onClick={() => setActiveGameCategory(null)}>Exit Arcade</button>}
+        >
+          <div style={{ padding: '0.5rem 0' }}>
+            <p style={{ margin: '0 0 1.2rem', color: 'var(--muted)', fontSize: '0.88rem', textAlign: 'center' }}>
+              Mindset recalibration mode active. Solve questions to gain XP and restore focus!
+            </p>
+            <div className="focused-game-modal-body" style={{ background: 'rgba(255, 255, 255, 0.02)', padding: '1.25rem', borderRadius: '16px', border: '1px solid var(--border)' }}>
+              <ContinuousGameCategoryCard category={activeGameCategory} onSolveReward={handleSolveReward} onBack={() => setActiveGameCategory(null)} />
+            </div>
+          </div>
         </Modal>
       )}
     </div>

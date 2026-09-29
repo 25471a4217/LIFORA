@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useApp } from '../context/AppContext';
+import { getQuestionsForUserTopics } from '../data/quizQuestions';
 
 const SKILL_ITEMS = [
   // Core Tech & AI
@@ -304,7 +305,7 @@ const CONNECTIONS = {
   }
 };
 
-const COURSE_MAPPING = {
+export const COURSE_MAPPING = {
   'Full Stack Development': { id: 'fullstack', title: 'Full Stack Web Engineering', icon: '💻', current: 'HTML, CSS & React Foundations', next: 'Node.js & Express REST APIs' },
   'Prompt Engineering': { id: 'prompt', title: 'LLM & Prompt Architecture', icon: '🤖', current: 'Zero-Shot & Few-Shot Prompts', next: 'Autonomous Agent Orchestration' },
   'Quantum Computing': { id: 'quantum', title: 'Quantum Algorithms & Qubits', icon: '⚛️', current: 'Superposition & Qubit States', next: 'Quantum Entanglement Simulation' },
@@ -572,7 +573,13 @@ Return ONLY a valid JSON object matching this structure exactly (do not include 
       onboardingComplete: true, 
       selectedAreas, 
       mainGoal: finalGoal,
-      courses: finalCourses
+      courses: finalCourses,
+      quiz: {
+        activeTopic: 'all',
+        questions: getQuestionsForUserTopics(selectedAreas, 5),
+        current: 0,
+        score: 0,
+      }
     });
     updateUser({ 
       focusAreas: selectedAreas, 
